@@ -1,0 +1,198 @@
+
+<!DOCTYPE html><html><head>
+  <title>Ijra Calculator</title>
+ <script>
+    function calculate() {
+      var rakba = parseFloat(document.getElementById("rakba").value);
+      var rate = parseFloat(document.getElementById("rate").value);
+      var dateThreeA = parseDate(document.getElementById("dateThreeA").value);
+      var dateThreeD = parseDate(document.getElementById("dateThreeD").value);
+      var dateFiling = parseDate(document.getElementById("dateFiling").value);
+	  var DiffAmount = parseFloat(document.getElementById("DiffAmount").value);
+
+
+      var basicAmount = rakba * rate;
+	  if (!isNaN(DiffAmount)) {
+    basicAmount = DiffAmount; // If DiffAmount is provided, use it instead of basicAmount
+}
+      var solatium = 0.3 * basicAmount;
+      var interest3ATo3D = calculateInterestA(dateThreeA, dateThreeD, basicAmount, solatium, 0.12);
+      var interestFor1Year = 0.09 * (basicAmount + solatium);
+      var totalSum = basicAmount + solatium + interest3ATo3D;
+      var interest3DToFilinng = calculateInterest(getOneYearAfter(dateThreeD), dateFiling, totalSum, 0.15);
+	  var receivedAmountSelect = document.getElementById("receivedAmount");
+	  
+      var receivedAmountValue = receivedAmountSelect.value;
+	  // Calculate number of days between dateThreeA and dateThreeD
+var diffDaysThreeAtoThreeD = Math.ceil((dateThreeD - dateThreeA) / (1000 * 60 * 60 * 24));
+
+// Calculate dateThreeD + 1 year
+var dateThreeDPlusOneYear = new Date(dateThreeD);
+dateThreeDPlusOneYear.setFullYear(dateThreeD.getFullYear() + 1);
+
+// Calculate number of days between dateThreeD + 1 year and dateFiling
+var diffDaysThreeDOneYeartoFiling = Math.ceil((dateFiling - dateThreeDPlusOneYear) / (1000 * 60 * 60 * 24));
+
+// Assuming diffDaysThreeDOneYeartoFiling contains the calculated value
+
+// Retrieve the table cell
+var diffDaysThreeDOneYeartoFilingCell = document.getElementById("diffDaysThreeDOneYeartoFiling");
+
+// Convert the value to a string if necessary
+var stringValue = diffDaysThreeDOneYeartoFiling.toString(); // Convert to string if needed
+
+// Set the value in the table cell
+diffDaysThreeDOneYeartoFilingCell.innerText = stringValue;
+
+
+      var totalDecretalAmount;
+
+if (receivedAmountValue === "yes") {
+    totalDecretalAmount = totalSum + interest3DToFilinng + interestFor1Year - basicAmount;
+} else if (receivedAmountValue === "no") {
+    totalDecretalAmount = totalSum + interest3DToFilinng + interestFor1Year;
+}
+var perDayInterest = calculatePerDayInterest(totalDecretalAmount);
+
+      displayResult("basicAmount", basicAmount);
+      displayResult("solatium", solatium);
+      displayResult("interest3ATo3D", interest3ATo3D);
+      displayResult("interestFor1Year", interestFor1Year);
+      displayResult("totalSum", totalSum);
+      displayResult("interest3DToFiling", interest3DToFilinng);
+      displayResult("totalDecretalAmount", totalDecretalAmount);
+	  displayResult("diffDaysThreeAtoThreeD", diffDaysThreeAtoThreeD);
+	  displayResult("perDayInterest", perDayInterest);
+
+    }
+
+    function parseDate(dateString) {
+      var parts = dateString.split("/");
+      return new Date(parts[2], parts[1] - 1, parts[0]); // Year, Month (zero-based), Day
+    }
+function calculateInterestA(startDate, endDate, principal, principal1, rate) {
+      var timeDiff = Math.abs(endDate - startDate); // Difference in milliseconds
+      var days = Math.ceil(timeDiff / (1000 * 3600 * 24)); // Convert to days
+      var years = days / 365; // Convert days to years
+      var interest = (principal + principal1)* rate * years;
+      return interest;
+    }
+    function calculateInterest(startDate, endDate, principal, rate) {
+      var timeDiff = Math.abs(endDate - startDate); // Difference in milliseconds
+      var days = Math.ceil(timeDiff / (1000 * 3600 * 24)); // Convert to days
+      var years = days / 365; // Convert days to years
+      var interest = principal * rate * years;
+      return interest;
+    }
+
+    function getOneYearAfter(date) {
+      var oneYearAfter = new Date(date);
+      oneYearAfter.setFullYear(oneYearAfter.getFullYear() + 1);
+      return oneYearAfter;
+    }
+	
+	function calculatePerDayInterest(totalDecretalAmount) {
+  if (!isNaN(totalDecretalAmount)) {
+    var interestRate = 0.15; // 15% per annum
+    var daysInYear = 365; // Considering 365 days in a year
+
+    var perAnnumInterest = totalDecretalAmount * interestRate;
+    var perDayInterest = perAnnumInterest / daysInYear;
+
+    return perDayInterest;
+  } else {
+    return 0; // Or handle the case when totalDecretalAmount is not a valid number
+  } }
+
+    function displayResult(elementId, value) {
+      var element = document.getElementById(elementId);
+      if (!isNaN(value)) {
+        element.innerHTML = formatIndianCurrency(value);
+      } else {
+        element.innerHTML = "Invalid date or input";
+      }
+    }
+	function formatIndianCurrency(value) {
+      return value.toLocaleString("en-IN");
+    }
+  </script>
+<script type="text/javascript" src="https://tiiny.host/ad-script.js"></script><script defer="" data-domain="thds.tiiny.site" src="https://analytics.tiiny.site/js/plausible.js"></script><script type="text/javascript" src="https://tiiny.host/ad-script.js"></script><script defer data-domain="thds.tiiny.site" src="https://analytics.tiiny.site/js/plausible.js"></script></head>
+<body>
+  <h1>Ijra Calculator</h1>
+  <table>
+    <tbody><tr>
+      <td>1. Rakba in mtr:</td>
+      <td><input type="text" id="rakba"></td>
+    </tr>
+    <tr>
+      <td>2. Rate:</td>
+      <td><input type="text" id="rate"></td>
+    </tr>
+	<tr>
+      <td>3. Different Amount:</td>
+      <td><input type="text" id="DiffAmount"></td>
+    </tr>
+	<tr>
+		<td>4. Is the Amount Recieved?</td>
+		<td><select id="receivedAmount">
+    <option value="yes">Yes</option>
+    <option value="no">No</option>
+</select></td></tr>
+    <tr>
+      <td>5. Date of 3A (DD/MM/YYYY):</td>
+      <td><input type="text" id="dateThreeA" placeholder="DD/MM/YYYY"></td>
+    </tr>
+    <tr>
+      <td>6. Date of 3D(DD/MM/YYYY):</td>
+      <td><input type="text" id="dateThreeD" placeholder="DD/MM/YYYY"></td>
+    </tr>
+    <tr>
+      <td>7. Date of Filing (DD/MM/YYYY):</td>
+      <td><input type="text" id="dateFiling" placeholder="DD/MM/YYYY"></td>
+    </tr>
+  </tbody></table>
+  <button onclick="calculate()">Calculate</button>
+  <br><br>
+  <table border="1">
+    <tbody><tr>
+      <th>Description</th>
+      <th>Amount</th>
+    </tr>
+    <tr>
+      <td><b>A.</b> Basic Amount</td>
+      <td id="basicAmount"></td>
+    </tr>
+    <tr>
+      <td><b>B.</b> 30% Solatium</td>
+      <td id="solatium"></td>
+    </tr>
+    <tr>
+      <td><b>C.</b> 12% Interest from 3A to 3D</td>
+      <td id="interest3ATo3D"></td>
+	<td id="diffDaysThreeAtoThreeD"></td>
+    </tr>
+    <tr>
+      <td><b>D.</b> 9% Interest for 1 Year</td>
+      <td id="interestFor1Year"></td>
+    </tr>
+    <tr>
+      <td><b>E.</b> Total sum of A,B,C</td>
+      <td id="totalSum"></td>
+    </tr>
+    <tr>
+      <td><b>F.</b> 15% Interest from 3D+1Year to Date of Filing</td>
+      <td id="interest3DToFiling"></td>
+	  <td id="diffDaysThreeDOneYeartoFiling"></td>
+    </tr>
+    <tr>
+      <td><b>G.</b> Total Decretal Amount</td>
+      <td id="totalDecretalAmount"></td>
+    </tr>
+	 <tr>
+	 <td><b>H.</b> Per Day Interest</td>
+      <td id="perDayInterest"></td>
+    </tr>
+  </tbody></table>
+
+
+</body></html>
