@@ -48,10 +48,20 @@ diffDaysThreeDOneYeartoFilingCell.innerText = stringValue;
       var totalDecretalAmount;
 
 if (receivedAmountValue === "yes") {
-    totalDecretalAmount = totalSum + interest3DToFilinng + interestFor1Year - basicAmount;
+    totalDecretalAmount = solatium + interest3ATo3D + interest3DToFilinng + interestFor1Year;
 } else if (receivedAmountValue === "no") {
-    totalDecretalAmount = totalSum + interest3DToFilinng + interestFor1Year;
+    totalDecretalAmount = solatium + interest3ATo3D + interest3DToFilinng + interestFor1Year + basicAmount;
 }
+	    // Update the label text based on receivedAmountValue
+var labelCell = document.getElementById("totalDecretalAmountLabel");
+if (labelCell) {
+  if (receivedAmountValue === "yes") {
+    labelCell.innerHTML = "<b>G.</b> Total Decretal Amount (B+C+D+F)";
+  } else {
+    labelCell.innerHTML = "<b>G.</b> Total Decretal Amount (A+B+C+D+F)";
+  }
+}
+
 var perDayInterest = calculatePerDayInterest(totalDecretalAmount);
 
       displayResult("basicAmount", basicAmount);
@@ -180,12 +190,12 @@ function calculateInterestA(startDate, endDate, principal, principal1, rate) {
       <td id="totalSum"></td>
     </tr>
     <tr>
-      <td><b>F.</b> 15% Interest from 3D+1Year to Date of Filing</td>
+      <td><b>F.</b> 15% Interest from 3D+1Year to Date of Filing on Column E</td>
       <td id="interest3DToFiling"></td>
 	  <td id="diffDaysThreeDOneYeartoFiling"></td>
     </tr>
     <tr>
-      <td><b>G.</b> Total Decretal Amount</td>
+      <td id="totalDecretalAmountLabel"><b>G.</b> Total Decretal Amount</td>
       <td id="totalDecretalAmount"></td>
     </tr>
 	 <tr>
