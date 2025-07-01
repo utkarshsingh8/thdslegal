@@ -16,9 +16,9 @@
     basicAmount = DiffAmount; // If DiffAmount is provided, use it instead of basicAmount
 }
       var solatium = 0.3 * basicAmount;
-      var interest3ATo3D = calculateInterestA(dateThreeA, dateThreeD, basicAmount, solatium, 0.12);
+      var interest3ATo3D = calculateInterestA(dateThreeA, dateThreeD, basicAmount, 0.12);
       var interestFor1Year = 0.09 * (basicAmount + solatium);
-      var totalSum = basicAmount + solatium + interest3ATo3D;
+      var totalSum = basicAmount + solatium;
       var interest3DToFilinng = calculateInterest(getOneYearAfter(dateThreeD), dateFiling, totalSum, 0.15);
 	  var receivedAmountSelect = document.getElementById("receivedAmount");
 	  
@@ -80,11 +80,11 @@ var perDayInterest = calculatePerDayInterest(totalDecretalAmount);
       var parts = dateString.split("/");
       return new Date(parts[2], parts[1] - 1, parts[0]); // Year, Month (zero-based), Day
     }
-function calculateInterestA(startDate, endDate, principal, principal1, rate) {
+function calculateInterestA(startDate, endDate, principal, rate) {
       var timeDiff = Math.abs(endDate - startDate); // Difference in milliseconds
       var days = Math.ceil(timeDiff / (1000 * 3600 * 24)); // Convert to days
       var years = days / 365; // Convert days to years
-      var interest = (principal + principal1)* rate * years;
+      var interest = principal * rate * years;
       return interest;
     }
     function calculateInterest(startDate, endDate, principal, rate) {
@@ -177,16 +177,16 @@ function calculateInterestA(startDate, endDate, principal, principal1, rate) {
       <td id="solatium"></td>
     </tr>
     <tr>
-      <td><b>C.</b> 12% Interest from 3A to 3D</td>
+      <td><b>C.</b> 12% Interest from 3A to 3D on A</td>
       <td id="interest3ATo3D"></td>
 	<td id="diffDaysThreeAtoThreeD"></td>
     </tr>
     <tr>
-      <td><b>D.</b> 9% Interest for 1 Year</td>
+      <td><b>D.</b> 9% Interest for 1 Year on A+B</td>
       <td id="interestFor1Year"></td>
     </tr>
     <tr>
-      <td><b>E.</b> Total sum of A,B,C</td>
+      <td><b>E.</b> Total sum of A and B</td>
       <td id="totalSum"></td>
     </tr>
     <tr>
