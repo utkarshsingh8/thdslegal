@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ijra NH 235 Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      line-height: 1.6;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input {
+      padding: 5px;
+      margin-top: 3px;
+      width: 200px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 8px 16px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .results {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ccc;
+      background: #f9f9f9;
+      width: fit-content;
+    }
+    .results div {
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Land Award Calculator</h2>
+
+  <label>1. Area:
+    <input type="number" id="area" placeholder="Enter Area">
+  </label>
+
+  <label>2. Date of Acquisition (DD/MM/YY):
+    <input type="text" id="acquisitionDate" value="12/07/12">
+  </label>
+
+  <label>2.1 Next Date (DD/MM/YY):
+    <input type="text" id="nextDate" value="27/08/25">
+  </label>
+
+  <label>3. DM Award Rate:
+    <input type="number" id="dmRate" placeholder="Enter DM Award Rate">
+  </label>
+
+  <label>4. ADM Award Rate:
+    <input type="number" id="admRate" placeholder="Enter ADM Award Rate">
+  </label>
+
+  <button onclick="calculate()">Calculate</button>
+
+  <div class="results" id="results"></div>
+
+  <script>
+    function parseDate(str) {
+      // Parse DD/MM/YY into Date
+      let [dd, mm, yy] = str.split("/").map(Number);
+      yy = yy < 50 ? 2000 + yy : 1900 + yy; // assume <50 → 2000s, else 1900s
+      return new Date(yy, mm - 1, dd);
+    }
+
+    function calculate() {
+      let area = parseFloat(document.getElementById("area").value) || 0;
+      let acqDateStr = document.getElementById("acquisitionDate").value;
+      let nextDateStr = document.getElementById("nextDate").value;
+      let dmRate = parseFloat(document.getElementById("dmRate").value) || 0;
+      let admRate = parseFloat(document.getElementById("admRate").value) || 0;
+
+      let dmAmount = area * dmRate;
+      let admAmount = area * admRate;
+      let difference = dmAmount - admAmount; // as per requirement (DM - ADM)
+
+      let acqDate = parseDate(acqDateStr);
+      let nextDate = parseDate(nextDateStr);
+
+      // Interest 9% for 1 year (simple interest on difference)
+      let interest9 = difference * 0.09;
+
+      // Date after +1 year from Acquisition
+      let acqPlus1Year = new Date(acqDate);
+      acqPlus1Year.setFullYear(acqDate.getFullYear() + 1);
+
+      // Number of days between acquisition+1 year & next date
+      let dayDiff = Math.floor((nextDate - acqPlus1Year) / (1000 * 60 * 60 * 24));
+
+      // 15% simple interest for that duration
+      let interest15 = difference * 0.15 * (dayDiff / 365);
+
+      // Per day interest at 15% pa
+      let perDayInterest = difference * 0.15 / 365;
+
+      let results = `
+        <div>5. DM Amount = ${dmAmount.toFixed(2)}</div>
+        <div>6. ADM Amount = ${admAmount.toFixed(2)}</div>
+        <div>7. Difference (DM - ADM) = ${difference.toFixed(2)}</div>
+        <div>8. 9% Interest on Difference (1 Year) = ${interest9.toFixed(2)}</div>
+        <div>9. No. of Days (Acquisition + 1 Year → Next Date) = ${dayDiff} days</div>
+        <div>10. 15% Interest on Difference (for ${dayDiff} days) = ${interest15.toFixed(2)}</div>
+        <div>11. Per Day Interest until deposit = ${perDayInterest.toFixed(4)}</div>
+      `;
+
+      document.getElementById("results").innerHTML = results;
+    }
+  </script>
+</body>
+</html>
