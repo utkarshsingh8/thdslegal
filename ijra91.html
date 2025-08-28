@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Land Acquisition Interest Calculator</title>
+  <style>
+    :root{--bg:#0b1220;--card:#121a2b;--ink:#e8eef8;--muted:#a8b0c3;--accent:#5ac8fa;--good:#2ecc71;--warn:#f39c12;--bad:#e74c3c;--bd:1px solid #22304d}
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    h1{font-size:1.4rem;margin:0 0 .75rem} h2{font-size:1.05rem;margin:1.25rem 0 .5rem;color:var(--muted)}
+    .wrap{max-width:980px;margin:24px auto;padding:0 16px}
+    .card{background:var(--card);border:var(--bd);border-radius:16px;padding:16px 16px 8px;box-shadow:0 6px 24px rgba(0,0,0,.35)}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+    .col-6{grid-column:span 6} .col-12{grid-column:span 12} .col-4{grid-column:span 4}
+    label{display:block;font-weight:600;margin-bottom:6px}
+    .muted{color:var(--muted)}
+    input[type="text"],input[type="number"]{width:100%;padding:10px 12px;border-radius:12px;border:var(--bd);background:#0e1524;color:var(--ink)}
+    input[readonly]{opacity:.75;}
+    .row{display:flex;gap:10px;align-items:center}
+    .hint{font-size:.8rem;color:var(--muted)}
+    .actions{display:flex;gap:10px;margin-top:8px}
+    button{cursor:pointer;border:var(--bd);background:#16243c;color:var(--ink);padding:10px 14px;border-radius:12px;font-weight:600}
+    button.primary{background:linear-gradient(180deg,#1d3b64,#173255);border-color:#2b4e7d}
+    table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    td{padding:10px 12px;background:#0e1524;border-top:var(--bd);border-bottom:var(--bd)}
+    td:first-child{border-left:var(--bd);border-radius:12px 0 0 12px;width:50%}
+    td:last-child{border-right:var(--bd);border-radius:0 12px 12px 0;text-align:right;font-variant-numeric:tabular-nums}
+    .ok{color:var(--good)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+    .checkbox{display:flex;gap:8px;align-items:center}
+    .small{font-size:.92rem}
+    .footer{margin-top:8px;color:var(--muted);font-size:.85rem}
+    .error{color:var(--bad);font-size:.85rem;margin-top:6px}
+    .sep{height:1px;background:#22304d;margin:10px 0 6px;border-radius:1px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Land Acquisition Interest Calculator</h1>
+      <div class="grid">
+        <!-- 1. Area -->
+        <div class="col-6">
+          <label for="area">1) Area</label>
+          <input id="area" type="number" min="0" step="0.0001" placeholder="e.g. 123.45" />
+          <div id="err-area" class="error" hidden>Enter a valid non‑negative number.</div>
+        </div>
+        <!-- 2. DM Rate -->
+        <div class="col-6">
+          <label for="dmRate">2) DM Rate</label>
+          <input id="dmRate" type="number" min="0" step="0.01" placeholder="e.g. 5000" />
+          <div id="err-dmRate" class="error" hidden>Enter a valid non‑negative number.</div>
+        </div>
+        <!-- 3. 3D Date -->
+        <div class="col-6">
+          <label for="date3d">3) 3D Date</label>
+          <input id="date3d" type="text" inputmode="numeric" placeholder="DD/MM/YY" pattern="^\\d{2}/\\d{2}/\\d{2}$" />
+          <div class="hint">Format: DD/MM/YY</div>
+          <div id="err-date3d" class="error" hidden>Enter a valid date in DD/MM/YY.</div>
+        </div>
+        <!-- 4. Date of Possession + checkbox -->
+        <div class="col-6">
+          <label for="datePos">4) Date of Possession</label>
+          <div class="row">
+            <input id="datePos" type="text" inputmode="numeric" placeholder="DD/MM/YY" pattern="^\\d{2}/\\d{2}/\\d{2}$" />
+          </div>
+          <div class="checkbox small" style="margin-top:6px">
+            <input id="sameAs3D" type="checkbox" checked />
+            <label for="sameAs3D" class="muted" style="font-weight:500">Same as 3D</label>
+          </div>
+          <div id="err-datePos" class="error" hidden>Enter a valid date in DD/MM/YY.</div>
+        </div>
+        <!-- 5. Next Date -->
+        <div class="col-6">
+          <label for="nextDate">5) Next Date</label>
+          <input id="nextDate" type="text" inputmode="numeric" placeholder="DD/MM/YY" pattern="^\\d{2}/\\d{2}/\\d{2}$" />
+          <div class="hint">Format: DD/MM/YY</div>
+          <div id="err-nextDate" class="error" hidden>Enter a valid date in DD/MM/YY.</div>
+        </div>
+        <!-- 6. Different Amount -->
+        <div class="col-6">
+          <label>6) Different Amount</label>
+          <div class="row">
+            <input id="diffAmount" type="number" min="0" step="0.01" placeholder="Optional" readonly />
+            <label class="checkbox small"><input id="useDiff" type="checkbox" /> Allow manual amount</label>
+          </div>
+          <div id="err-diff" class="error" hidden>Enter a valid non‑negative number.</div>
+          <div class="hint">If enabled and filled, this replaces Point 7 (DM Amount).</div>
+        </div>
+        <div class="col-12 actions">
+          <button class="primary" id="btnCalc">Calculate</button>
+          <button id="btnReset">Reset</button>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <h2>Results</h2>
+      <table>
+        <tbody>
+          <tr><td>7) DM Amount</td><td id="r7">—</td></tr>
+          <tr><td>8) Solatium 30% (S.23(2))</td><td id="r8">—</td></tr>
+          <tr><td>9) Total (7 + 8)</td><td id="r9">—</td></tr>
+          <tr><td>10) No. of days from <span class="muted">(Possession/3D + 1 year)</span> to Next Date</td><td id="r10">—</td></tr>
+          <tr><td>11) 9% interest for 1 year (on 9)</td><td id="r11">—</td></tr>
+          <tr><td>12) 15% interest for days in (10) (on 9)</td><td id="r12">—</td></tr>
+          <tr><td>13) Per‑day interest at 15% (on 9)</td><td id="r13">—</td></tr>
+          <tr><td><strong>14) Total Decreetal Amount (9 + 11 + 12)</strong></td><td id="r14">—</td></tr>
+        </tbody>
+      </table>
+
+      <div class="footer">
+        Notes: Dates must be in DD/MM/YY and are interpreted as 20YY (e.g., 12/07/12 → 12 Jul 2012). Days are counted as actual days between dates, with negative ranges treated as 0. Interest uses simple interest: 9% for one year exactly; 15% prorated by days/365.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id)=>document.getElementById(id);
+
+    const msPerDay = 24*60*60*1000;
+
+    function parseDDMMYY(str){
+      if(!/^\d{2}\/\d{2}\/\d{2}$/.test(str||'')) return null;
+      const [d,m,y] = str.split('/').map(Number);
+      const year = 2000 + y; // interpret YY as 20YY
+      const dt = new Date(year, m-1, d);
+      if(dt.getFullYear()!==year || dt.getMonth()!==m-1 || dt.getDate()!==d) return null; // invalid date like 31/02/24
+      return dt;
+    }
+
+    function formatMoney(n){
+      if(!isFinite(n)) return '—';
+      return n.toLocaleString('en-IN',{minimumFractionDigits:2, maximumFractionDigits:2});
+    }
+
+    function showError(id, show){ $(id).hidden = !show; }
+
+    function addOneYear(d){
+      const nd = new Date(d.getTime());
+      nd.setFullYear(d.getFullYear()+1);
+      return nd;
+    }
+
+    function diffDays(a,b){
+      const diff = Math.floor((b - a)/msPerDay);
+      return diff < 0 ? 0 : diff;
+    }
+
+    function compute(){
+      const area = parseFloat($("area").value);
+      const dmRate = parseFloat($("dmRate").value);
+      const d3 = parseDDMMYY($("date3d").value);
+      const dp = parseDDMMYY($("datePos").value);
+      const nd = parseDDMMYY($("nextDate").value);
+      const useDiff = $("useDiff").checked;
+      const diffAmountVal = $("diffAmount").value.trim();
+      const diffAmount = diffAmountVal === '' ? NaN : parseFloat(diffAmountVal);
+
+      let ok = true;
+      showError('err-area', !(isFinite(area) && area >= 0)); ok &= (isFinite(area) && area >= 0);
+      showError('err-dmRate', !(isFinite(dmRate) && dmRate >= 0)); ok &= (isFinite(dmRate) && dmRate >= 0);
+      showError('err-date3d', !d3); ok &= !!d3;
+      showError('err-datePos', !dp); ok &= !!dp;
+      showError('err-nextDate', !nd); ok &= !!nd;
+      showError('err-diff', useDiff && !(isFinite(diffAmount) && diffAmount >= 0));
+      if(useDiff && !(isFinite(diffAmount) && diffAmount >= 0)) ok = false;
+      if(!ok) return;
+
+      const dmAmountDefault = area * dmRate;
+      const dmAmount = (useDiff && isFinite(diffAmount)) ? diffAmount : dmAmountDefault;
+
+      const solatium = 0.30 * dmAmount;
+      const total9 = dmAmount + solatium;
+
+      const start = addOneYear(dp);
+      const days10 = diffDays(start, nd);
+
+      const interest9 = 0.09 * total9;
+      const perDay = 0.15 * total9 / 365;
+      const interest15 = perDay * days10;
+
+      const total14 = total9 + interest9 + interest15;
+
+      $("r7").textContent = formatMoney(dmAmount);
+      $("r8").textContent = formatMoney(solatium);
+      $("r9").textContent = formatMoney(total9);
+      $("r10").textContent = days10.toLocaleString('en-IN');
+      $("r11").textContent = formatMoney(interest9);
+      $("r12").textContent = formatMoney(interest15);
+      $("r13").textContent = formatMoney(perDay);
+      $("r14").textContent = formatMoney(total14);
+    }
+
+    function syncPossessionFrom3D(){
+      if($("sameAs3D").checked){
+        $("datePos").value = $("date3d").value;
+        $("datePos").setAttribute('readonly','readonly');
+      } else {
+        $("datePos").removeAttribute('readonly');
+      }
+    }
+
+    $("btnCalc").addEventListener('click', compute);
+    $("btnReset").addEventListener('click', ()=>{ document.querySelector('form')?.reset(); location.reload(); });
+    $("sameAs3D").addEventListener('change', syncPossessionFrom3D);
+    $("date3d").addEventListener('input', syncPossessionFrom3D);
+    $("useDiff").addEventListener('change', (e)=>{
+      if(e.target.checked){
+        $("diffAmount").removeAttribute('readonly');
+        $("diffAmount").focus();
+      } else {
+        $("diffAmount").setAttribute('readonly','readonly');
+        $("diffAmount").value = '';
+      }
+    });
+
+    syncPossessionFrom3D();
+  </script>
+</body>
+</html>
