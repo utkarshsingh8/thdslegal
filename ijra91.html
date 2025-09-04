@@ -36,7 +36,7 @@
 <body>
   <div class="wrap">
     <div class="card">
-      <h1>Land Acquisition Interest Calculator</h1>
+      <h1>Tarsem Singh Ijra Calculator</h1>
       <div class="grid">
         <!-- 1. Area -->
         <div class="col-6">
@@ -104,7 +104,7 @@
           <tr><td>11) 9% interest for 1 year (on 9)</td><td id="r11">—</td></tr>
           <tr><td>12) 15% interest for days in (10) (on 9)</td><td id="r12">—</td></tr>
           <tr><td>13) Per‑day interest at 15% (on 9)</td><td id="r13">—</td></tr>
-          <tr><td><strong>14) Total Decreetal Amount (9 + 11 + 12)</strong></td><td id="r14">—</td></tr>
+          <tr><td><strong>14) Total Decreetal Amount (8 + 11 + 12)</strong></td><td id="r14">—</td></tr>
         </tbody>
       </table>
 
@@ -179,7 +179,7 @@
       const perDay = 0.15 * total9 / 365;
       const interest15 = perDay * days10;
 
-      const total14 = total9 + interest9 + interest15;
+      const total14 = solatium + interest9 + interest15;
 
       $("r7").textContent = formatMoney(dmAmount);
       $("r8").textContent = formatMoney(solatium);
