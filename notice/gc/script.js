@@ -22,13 +22,13 @@ let isMuted = false;
 
 // Photo URLs for falling background
 const photoUrls = [
-    '1.jpeg',
-    '2.jpeg',
-    '3.jpeg',
-    '4.jpeg',
-    '5.jpeg',
-    '6.jpeg',
-    '7.jpeg'
+    'https://www.genspark.ai/api/files/s/hpD4N5Sf',
+    'https://www.genspark.ai/api/files/s/gQzG3l0A',
+    'https://www.genspark.ai/api/files/s/dMEQHcnV',
+    'https://www.genspark.ai/api/files/s/oFA0FnSO',
+    'https://www.genspark.ai/api/files/s/CYdFVlOr',
+    'https://www.genspark.ai/api/files/s/wzZcAGBA',
+    'https://www.genspark.ai/api/files/s/9JRhxgtQ'
 ];
 
 // Attempt to autoplay music when page loads
@@ -52,8 +52,10 @@ window.addEventListener('load', () => {
 });
 
 // Attempt to play music on first user interaction if autoplay failed
+let firstClickHandled = false;
 document.addEventListener('click', () => {
-    if (isMuted && backgroundMusic.paused) {
+    if (!firstClickHandled && backgroundMusic.paused) {
+        firstClickHandled = true;
         backgroundMusic.play().then(() => {
             isMuted = false;
             audioToggle.classList.remove('muted');
@@ -62,7 +64,7 @@ document.addEventListener('click', () => {
             console.log('Audio autoplay prevented:', e);
         });
     }
-}, { once: true });
+});
 
 // Audio toggle button
 audioToggle.addEventListener('click', (e) => {
