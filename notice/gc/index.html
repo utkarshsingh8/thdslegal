@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>High Court Notice – Under Preparation</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle at top, #2b0000, #000000 70%);
+    font-family: 'Poppins', sans-serif;
+    color: #f5f5f5;
+    text-align: center;
+    overflow: hidden;
+}
+
+/* Watermark Seal */
+body::before {
+    content: "HIGH COURT OF THE HEART";
+    position: absolute;
+    font-family: 'Cinzel', serif;
+    font-size: 60px;
+    color: rgba(255, 255, 255, 0.04);
+    transform: rotate(-25deg);
+    letter-spacing: 5px;
+    white-space: nowrap;
+}
+
+/* Main Card */
+.container {
+    position: relative;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 60px 50px;
+    border-radius: 20px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 60px rgba(139, 0, 0, 0.6);
+    max-width: 550px;
+    width: 90%;
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    letter-spacing: 2px;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+}
+
+p {
+    font-size: 18px;
+    line-height: 1.6;
+    font-weight: 300;
+    opacity: 0.9;
+}
+
+.signature {
+    margin-top: 35px;
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    opacity: 0.8;
+}
+
+.stamp {
+    margin-top: 25px;
+    font-size: 40px;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Notice Under Preparation</h1>
+    <p>
+        Abhi bana raha hoon… ruk jao.<br><br>
+        Sabr rakho. Is Court ki karwai thodi khaas hai.<br>
+        Dil ka faisla likhne mein waqt lagta hai.
+    </p>
+
+    <div class="stamp">⚖️</div>
+
+    <div class="signature">
+        — By Order of Adv. Utkarsh Singh
+    </div>
+</div>
+
+</body>
+</html>
