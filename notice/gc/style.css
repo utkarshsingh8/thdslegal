@@ -83,6 +83,7 @@ body {
     animation: etherealGlow 20s ease infinite;
     position: relative;
     overflow: hidden;
+    z-index: 10;
 }
 
 @keyframes etherealGlow {
@@ -295,7 +296,9 @@ body {
     min-height: 100vh;
     width: 100%;
     display: none;
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
     overflow: hidden;
 }
 
@@ -310,6 +313,7 @@ body {
     background: linear-gradient(135deg, #1a0e1e 0%, #3d1635 50%, #1a0e1e 100%);
     background-size: 400% 400%;
     animation: gradientShift 15s ease infinite;
+    z-index: 9;
 }
 
 @keyframes gradientShift {
