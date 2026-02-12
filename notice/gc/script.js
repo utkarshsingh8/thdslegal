@@ -22,13 +22,13 @@ let isMuted = false;
 
 // Photo URLs for falling background
 const photoUrls = [
-    'https://www.genspark.ai/api/files/s/hpD4N5Sf',
-    'https://www.genspark.ai/api/files/s/gQzG3l0A',
-    'https://www.genspark.ai/api/files/s/dMEQHcnV',
-    'https://www.genspark.ai/api/files/s/oFA0FnSO',
-    'https://www.genspark.ai/api/files/s/CYdFVlOr',
-    'https://www.genspark.ai/api/files/s/wzZcAGBA',
-    'https://www.genspark.ai/api/files/s/9JRhxgtQ'
+'https://www.thdslegal.com/notice/gc/1.jpeg',
+'https://www.thdslegal.com/notice/gc/2.jpeg',
+'https://www.thdslegal.com/notice/gc/3.jpeg',
+'https://www.thdslegal.com/notice/gc/4.jpeg',
+'https://www.thdslegal.com/notice/gc/5.jpeg',
+'https://www.thdslegal.com/notice/gc/6.jpeg',
+'https://www.thdslegal.com/notice/gc/7.jpeg'
 ];
 
 // Attempt to autoplay music when page loads
