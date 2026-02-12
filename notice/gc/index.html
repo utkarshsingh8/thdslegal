@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine Match Maker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Custom Cursor Heart -->
+    <div id="customCursor" class="custom-cursor">❤️</div>
+
+    <!-- Audio Player -->
+    <audio id="backgroundMusic" loop autoplay>
+        <source src="assets/Dil-Dardeh.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Mute/Unmute Button -->
+    <button id="audioToggle" class="audio-toggle" title="Toggle Music">
+        <span class="audio-icon">🔊</span>
+    </button>
+
+    <!-- Section 0: Welcome Screen -->
+    <section id="welcomeScreen" class="screen active">
+        <div class="welcome-photos-bg" id="welcomePhotosBg"></div>
+        <div class="welcome-container">
+            <div class="welcome-glow"></div>
+            <h1 class="welcome-title">⚖️ High Court of My Heart ⚖️</h1>
+            <div class="welcome-message" id="welcomeMessage"></div>
+            <button id="chalooBtn" class="chaloo-btn hidden">Chalooooooo 💕</button>
+        </div>
+    </section>
+
+    <!-- Section 1: Password Screen -->
+    <section id="passwordScreen" class="screen active">
+        <div class="password-container">
+            <h1 class="dramatic-text">Enter Password...</h1>
+            <input type="password" id="passwordInput" placeholder="Type password">
+            <button id="passwordSubmit">Submit</button>
+        </div>
+        <div class="flower-explosion" id="flowerExplosion"></div>
+    </section>
+
+    <!-- Section 2: Valentine Match Maker Form -->
+    <section id="formScreen" class="screen">
+        <div class="form-container">
+            <h1 class="form-title">Valentine Match Maker</h1>
+            
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="thinking-emoji" id="thinkingEmoji">🤔</div>
+                <div class="thinking-text" id="thinkingText"></div>
+            </div>
+
+            <!-- Questions Container -->
+            <div id="questionsContainer"></div>
+        </div>
+    </section>
+
+    <!-- Section 3: Analysis Report -->
+    <section id="analysisScreen" class="screen">
+        <div class="analysis-container">
+            <h2>Evaluating your Perfect Valentine...</h2>
+            <p>Please wait.</p>
+            
+            <div class="analysis-visuals">
+                <div class="fake-graph">
+                    <div class="graph-bar" style="height: 70%"></div>
+                    <div class="graph-bar" style="height: 85%"></div>
+                    <div class="graph-bar" style="height: 95%"></div>
+                    <div class="graph-bar" style="height: 100%"></div>
+                </div>
+                
+                <div class="spinning-circle">
+                    <div class="circle-segment"></div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Compatibility:</span>
+                        <span class="stat-value" id="compatStat">0%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Emotional Match:</span>
+                        <span class="stat-value" id="emotionalStat">0%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Perfect Score:</span>
+                        <span class="stat-value" id="perfectStat">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="verdictContainer" class="verdict-container hidden">
+                <div class="verdict-text">
+                    <p>After careful examination of all submitted inputs,</p>
+                    <p>cross-verification of emotional parameters,</p>
+                    <p>and a detailed compatibility hearing...</p>
+                    <br>
+                    <p class="verdict-declaration">It is hereby declared that:</p>
+                    <h2 class="verdict-name">Utkarsh Singh</h2>
+                    <p class="verdict-role">is your rightful Valentine.</p>
+                    <br>
+                    <p class="verdict-final">This decision is final, binding, and non-appealable.</p>
+                    <p class="verdict-final">Court adjourned. ❤️</p>
+                </div>
+                <button id="continueBtn" class="continue-btn">Continue</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Final Showdown -->
+    <section id="finalScreen" class="screen">
+        <div class="final-container">
+            <div class="drum-emojis">
+                <span>🥁</span>
+                <span>🥁</span>
+                <span>🥁</span>
+            </div>
+            
+            <div id="finalTextSequence" class="final-text-sequence">
+                <p class="fade-text">You've seen the results.</p>
+                <p class="fade-text">You've read the verdict.</p>
+                <p class="fade-text">You know the answer.</p>
+                <p class="fade-text">But I still want to ask you properly —</p>
+            </div>
+
+            <div id="finalQuestion" class="final-question hidden">
+                <h1 class="typing-text">On this 14th February... will you choose me?</h1>
+                <div class="final-buttons">
+                    <button id="yesBtn" class="choice-btn yes-btn">YES</button>
+                    <button id="noBtn" class="choice-btn no-btn">NO</button>
+                </div>
+            </div>
+
+            <div id="celebrationContainer" class="celebration-container hidden"></div>
+        </div>
+    </section>
+
+    <!-- Popup Modal -->
+    <div id="popupModal" class="popup-modal hidden">
+        <div class="popup-content">
+            <p id="popupText"></p>
+            <button id="popupClose">OK</button>
+        </div>
+    </div>
+
+    <!-- Red Alert Modal -->
+    <div id="redAlertModal" class="red-alert-modal hidden">
+        <div class="red-alert-content">
+            <div class="warning-icon">⚠️</div>
+            <h2>RED ALERT</h2>
+            <p id="redAlertText"></p>
+            <div class="alert-buttons">
+                <button class="alert-btn" data-answer="Continue">Continue</button>
+                <button class="alert-btn" data-answer="Definitely">Definitely</button>
+                <button class="alert-btn" data-answer="Obviously">Obviously</button>
+                <button class="alert-btn" data-answer="It was always him">It was always him</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal for NO button -->
+    <div id="errorModal" class="error-modal hidden">
+        <div class="error-content">
+            <div class="angry-emojis">😡🔥😡🔥😡</div>
+            <h2>Hell No.</h2>
+            <button id="errorClose">Close</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
