@@ -6,18 +6,18 @@
     <title>School Business Planner - Financial Calculator</title>
     
     <style>
-        /* CSS Custom Properties for consistent theming */
+        /* CSS Custom Properties for black and white theme */
         :root {
-            --primary-color: #2563eb;
-            --primary-hover: #1d4ed8;
-            --secondary-color: #64748b;
-            --success-color: #059669;
-            --danger-color: #dc2626;
-            --background: #f8fafc;
+            --primary-color: #000000;
+            --primary-hover: #333333;
+            --secondary-color: #666666;
+            --success-color: #000000;
+            --danger-color: #000000;
+            --background: #ffffff;
             --surface: #ffffff;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --border-color: #e2e8f0;
+            --text-primary: #000000;
+            --text-secondary: #555555;
+            --border-color: #cccccc;
             --border-radius: 0.5rem;
             --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -33,7 +33,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background-color: var(--background);
+            background-color: #ffffff;
             color: var(--text-primary);
             line-height: 1.6;
             padding: 1rem;
@@ -108,7 +108,7 @@
         .card-icon {
             width: 2.5rem;
             height: 2.5rem;
-            background: var(--primary-color);
+            background: #000000;
             color: white;
             border-radius: 50%;
             display: flex;
@@ -145,12 +145,12 @@
 
         .form-input:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            border-color: #000000;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
         }
 
         .form-input:hover {
-            border-color: var(--primary-hover);
+            border-color: #333333;
         }
 
         /* Grid layouts */
@@ -202,7 +202,7 @@
         }
 
         tr:hover {
-            background: rgba(37, 99, 235, 0.05);
+            background: rgba(0, 0, 0, 0.05);
         }
 
         /* Buttons */
@@ -222,24 +222,24 @@
         }
 
         .btn-primary {
-            background: var(--primary-color);
+            background: #000000;
             color: white;
         }
 
         .btn-primary:hover {
-            background: var(--primary-hover);
+            background: #333333;
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
         .btn-primary:focus {
             outline: none;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.3);
         }
 
         /* Results and status */
         .results {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            background: #000000;
             color: white;
             border-radius: var(--border-radius);
             padding: 2rem;
@@ -296,7 +296,7 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: var(--primary-color);
+            background: #000000;
             cursor: pointer;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
@@ -305,7 +305,7 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: var(--primary-color);
+            background: #000000;
             cursor: pointer;
             border: none;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -315,7 +315,7 @@
             text-align: center;
             font-size: 1.25rem;
             font-weight: 600;
-            color: var(--primary-color);
+            color: #000000;
             margin-top: 0.5rem;
         }
 
@@ -332,13 +332,13 @@
         }
 
         .status-success {
-            background: rgba(5, 150, 105, 0.1);
-            color: var(--success-color);
+            background: rgba(0, 0, 0, 0.1);
+            color: #000000;
         }
 
         .status-danger {
-            background: rgba(220, 38, 38, 0.1);
-            color: var(--danger-color);
+            background: rgba(0, 0, 0, 0.1);
+            color: #000000;
         }
 
         /* Loading and disabled states */
@@ -362,7 +362,7 @@
 
         /* Focus styles */
         :focus-visible {
-            outline: 2px solid var(--primary-color);
+            outline: 2px solid #000000;
             outline-offset: 2px;
         }
 
@@ -444,22 +444,27 @@
             }
         }
 
-        /* Dark mode support */
+        /* Dark mode support - disabled for black and white theme */
         @media (prefers-color-scheme: dark) {
             :root {
-                --background: #0f172a;
-                --surface: #1e293b;
-                --text-primary: #f1f5f9;
-                --text-secondary: #94a3b8;
-                --border-color: #334155;
+                --primary-color: #000000;
+                --primary-hover: #333333;
+                --secondary-color: #666666;
+                --success-color: #000000;
+                --danger-color: #000000;
+                --background: #ffffff;
+                --surface: #ffffff;
+                --text-primary: #000000;
+                --text-secondary: #555555;
+                --border-color: #cccccc;
             }
 
             .card {
-                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
             }
 
             .card:hover {
-                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
             }
         }
     </style>
@@ -602,7 +607,7 @@
                             <div class="result-label">Transport Cost</div>
                         </div>
                         <div class="result-item">
-                            <div class="result-value" id="transportProfit" style="color: #dc2626;">-₹12,000</div>
+                            <div class="result-value" id="transportProfit" style="color: #000000;">-₹12,000</div>
                             <div class="result-label">Transport Profit/Loss</div>
                         </div>
                     </div>
@@ -632,7 +637,7 @@
                             <div class="result-label">Monthly Revenue</div>
                         </div>
                         <div class="result-item">
-                            <div class="result-value" id="sliderProfit" style="color: #dc2626;">-₹17,000</div>
+                            <div class="result-value" id="sliderProfit" style="color: #000000;">-₹17,000</div>
                             <div class="result-label">Monthly Profit/Loss</div>
                         </div>
                         <div class="result-item">
@@ -871,9 +876,9 @@
             document.getElementById('transportIncome').textContent = '₹' + income.toLocaleString();
             document.getElementById('transportCost').textContent = '₹' + cost.toLocaleString();
             
-            const profitElement = document.getElementById('transportProfit');
+        const profitElement = document.getElementById('transportProfit');
             profitElement.textContent = (profit >= 0 ? '₹' : '-₹') + Math.abs(profit).toLocaleString();
-            profitElement.style.color = profit >= 0 ? '#059669' : '#dc2626';
+            profitElement.style.color = profit >= 0 ? '#000000' : '#000000';
         }
 
         // Slider calculation
@@ -889,7 +894,7 @@
             
             const profitElement = document.getElementById('sliderProfit');
             profitElement.textContent = (profit >= 0 ? '₹' : '-₹') + Math.abs(profit).toLocaleString();
-            profitElement.style.color = profit >= 0 ? '#059669' : '#dc2626';
+            profitElement.style.color = profit >= 0 ? '#000000' : '#000000';
             
             document.getElementById('sliderAvgFee').textContent = '₹' + avgFee;
         }
