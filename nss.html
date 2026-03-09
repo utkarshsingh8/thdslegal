@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Business Planner - Financial Calculator</title>
+    
+    <style>
+        /* CSS Custom Properties for consistent theming */
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #64748b;
+            --success-color: #059669;
+            --danger-color: #dc2626;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --border-radius: 0.5rem;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.2s ease-in-out;
+        }
+
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 1rem;
+            min-height: 100vh;
+        }
+
+        /* Container and layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--surface);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        /* Card components */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        /* Form elements */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            background: var(--surface);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-input:hover {
+            border-color: var(--primary-hover);
+        }
+
+        /* Grid layouts */
+        .grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        .grid-4 {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+
+        /* Table styles */
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--surface);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--background);
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        tr:hover {
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            min-height: 2.75rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Results and status */
+        .results {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .result-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            backdrop-filter: blur(10px);
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .result-label {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        /* Slider */
+        .slider-container {
+            margin: 2rem 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-color);
+            outline: none;
+            -webkit-appearance: none;
+            margin: 1rem 0;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .slider-value {
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-top: 0.5rem;
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .status-success {
+            background: rgba(5, 150, 105, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-danger {
+            background: rgba(220, 38, 38, 0.1);
+            color: var(--danger-color);
+        }
+
+        /* Loading and disabled states */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Accessibility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Focus styles */
+        :focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .container {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.25rem;
+            }
+
+            .results {
+                padding: 1.5rem;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .result-value {
+                font-size: 1.5rem;
+            }
+
+            .grid-2, .grid-3, .grid-4 {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                margin: 0 -1rem;
+                padding: 0 1rem;
+            }
+
+            table {
+                font-size: 0.875rem;
+            }
+
+            th, td {
+                padding: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+
+            .btn {
+                display: none;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background: #0f172a;
+                --surface: #1e293b;
+                --text-primary: #f1f5f9;
+                --text-secondary: #94a3b8;
+                --border-color: #334155;
+            }
+
+            .card {
+                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+            }
+
+            .card:hover {
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🏫 School Business Planner</h1>
+            <p class="subtitle">Comprehensive financial planning tool for educational institutions</p>
+        </header>
+
+        <main>
+            <!-- Class Fees Section -->
+            <section class="card" role="region" aria-labelledby="class-fees-title">
+                <div class="card-header">
+                    <div class="card-icon" aria-hidden="true">💰</div>
+                    <div>
+                        <h2 id="class-fees-title">Class Fees & Enrollment</h2>
+                        <p class="text-secondary">Manage class-wise fees and student numbers</p>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table role="table" aria-label="Class fees and student enrollment table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Class</th>
+                                <th scope="col">Monthly Fee (₹)</th>
+                                <th scope="col">Number of Students</th>
+                                <th scope="col">Monthly Revenue (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="classFeesTable">
+                            <!-- Table rows will be generated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="form-group">
+                        <label class="form-label" for="totalStudents">Total Students</label>
+                        <input type="number" id="totalStudents" class="form-input" value="180" readonly aria-readonly="true">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="totalRevenue">Total Monthly Revenue (₹)</label>
+                        <input type="number" id="totalRevenue" class="form-input" value="144000" readonly aria-readonly="true">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Staff & Expenses Section -->
+            <section class="card" role="region" aria-labelledby="staff-expenses-title">
+                <div class="card-header">
+                    <div class="card-icon" aria-hidden="true">👥</div>
+                    <div>
+                        <h2 id="staff-expenses-title">Staff & Expenses</h2>
+                        <p class="text-secondary">Manage staff salaries and operational expenses</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="form-group">
+                        <label class="form-label" for="teachers">Number of Teachers</label>
+                        <input type="number" id="teachers" class="form-input" value="8" min="1" max="50" aria-describedby="teachers-help">
+                        <small id="teachers-help" class="text-secondary">Total teaching staff</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="salary">Teacher Salary (₹)</label>
+                        <input type="number" id="salary" class="form-input" value="10000" min="1000" step="1000" aria-describedby="salary-help">
+                        <small id="salary-help" class="text-secondary">Per teacher monthly salary</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="principal">Principal Salary (₹)</label>
+                        <input type="number" id="principal" class="form-input" value="18000" min="5000" step="1000">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="guard">Security Guard (₹)</label>
+                        <input type="number" id="guard" class="form-input" value="9000" min="3000" step="500">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="clerk">Clerk (₹)</label>
+                        <input type="number" id="clerk" class="form-input" value="5000" min="2000" step="500">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="sweeper">Sweeper (₹)</label>
+                        <input type="number" id="sweeper" class="form-input" value="5000" min="2000" step="500">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="other">Other Expenses (₹)</label>
+                        <input type="number" id="other" class="form-input" value="15000" min="0" step="1000" aria-describedby="other-help">
+                        <small id="other-help" class="text-secondary">Utilities, maintenance, supplies, etc.</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="totalExpenses">Total Monthly Expenses (₹)</label>
+                        <input type="number" id="totalExpenses" class="form-input" value="122000" readonly aria-readonly="true">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Transport Section -->
+            <section class="card" role="region" aria-labelledby="transport-title">
+                <div class="card-header">
+                    <div class="card-icon" aria-hidden="true">🚌</div>
+                    <div>
+                        <h2 id="transport-title">Transport Services</h2>
+                        <p class="text-secondary">Calculate transport service profitability</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="form-group">
+                        <label class="form-label" for="tfee">Transport Fee per Student (₹)</label>
+                        <input type="number" id="tfee" class="form-input" value="500" min="100" step="50" aria-describedby="tfee-help">
+                        <small id="tfee-help" class="text-secondary">Monthly transport fee</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="tstudents">Transport Students</label>
+                        <input type="number" id="tstudents" class="form-input" value="30" min="0" max="100" aria-describedby="tstudents-help">
+                        <small id="tstudents-help" class="text-secondary">Students using transport</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="driver">Driver Salary (₹)</label>
+                        <input type="number" id="driver" class="form-input" value="12000" min="5000" step="1000">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="fuel">Fuel & Maintenance (₹)</label>
+                        <input type="number" id="fuel" class="form-input" value="15000" min="5000" step="1000">
+                    </div>
+                </div>
+
+                <div id="transportResult" class="results" style="margin-top: 1.5rem;">
+                    <div class="results-grid">
+                        <div class="result-item">
+                            <div class="result-value" id="transportIncome">₹15,000</div>
+                            <div class="result-label">Transport Income</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-value" id="transportCost">₹27,000</div>
+                            <div class="result-label">Transport Cost</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-value" id="transportProfit" style="color: #dc2626;">-₹12,000</div>
+                            <div class="result-label">Transport Profit/Loss</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Break-Even Analysis -->
+            <section class="card" role="region" aria-labelledby="breakeven-title">
+                <div class="card-header">
+                    <div class="card-icon" aria-hidden="true">📊</div>
+                    <div>
+                        <h2 id="breakeven-title">Break-Even Analysis</h2>
+                        <p class="text-secondary">Interactive slider to analyze break-even scenarios</p>
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <label class="form-label" for="studentSlider">Number of Students: <span id="sliderValue">150</span></label>
+                    <input type="range" id="studentSlider" class="slider" min="50" max="600" value="150" step="10" aria-describedby="slider-help">
+                    <small id="slider-help" class="text-secondary">Adjust to see profit/loss at different enrollment levels</small>
+                </div>
+
+                <div id="sliderResult" class="results">
+                    <div class="results-grid">
+                        <div class="result-item">
+                            <div class="result-value" id="sliderRevenue">₹105,000</div>
+                            <div class="result-label">Monthly Revenue</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-value" id="sliderProfit" style="color: #dc2626;">-₹17,000</div>
+                            <div class="result-label">Monthly Profit/Loss</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-value" id="sliderAvgFee">₹700</div>
+                            <div class="result-label">Average Fee per Student</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Action Button -->
+            <div style="text-align: center; margin: 2rem 0;">
+                <button type="button" class="btn btn-primary" onclick="calculateFullScenario()" aria-label="Calculate complete financial scenario">
+                    🧮 Calculate Complete Financial Scenario
+                </button>
+            </div>
+
+            <!-- Results Section -->
+            <section id="resultsSection" class="results" style="display: none;" role="region" aria-labelledby="results-title">
+                <h2 id="results-title" style="margin-bottom: 1rem;">📈 Financial Summary</h2>
+                <div class="results-grid">
+                    <div class="result-item">
+                        <div class="result-value" id="resultTotalStudents">180</div>
+                        <div class="result-label">Total Students</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="resultRevenue">₹144,000</div>
+                        <div class="result-label">Monthly Revenue</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="resultExpenses">₹122,000</div>
+                        <div class="result-label">Monthly Expenses</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="resultProfit">₹22,000</div>
+                        <div class="result-label">Monthly Profit</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="resultBreakEven">175</div>
+                        <div class="result-label">Break-Even Students</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="resultAvgFee">₹800</div>
+                        <div class="result-label">Average Fee</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2rem; text-align: center; background: rgba(255,255,255,0.1); padding: 1rem; border-radius: var(--border-radius);">
+                    <p style="margin: 0; font-size: 1.1rem;">
+                        💡 <strong>Suggested Minimum:</strong> <span id="suggestedPerClass">20</span> students per class to break even
+                    </p>
+                </div>
+            </section>
+        </main>
+
+        <footer style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color); color: var(--text-secondary);">
+            <p>© 2024 School Business Planner - Built for accessibility and modern web standards</p>
+        </footer>
+    </div>
+
+    <script>
+        // Class data structure
+        const classData = [
+            { name: 'Nursery-UKG', fee: 500, students: 20 },
+            { name: 'Class 1', fee: 600, students: 20 },
+            { name: 'Class 2', fee: 650, students: 20 },
+            { name: 'Class 3', fee: 700, students: 20 },
+            { name: 'Class 4', fee: 750, students: 20 },
+            { name: 'Class 5', fee: 800, students: 20 },
+            { name: 'Class 6', fee: 850, students: 20 },
+            { name: 'Class 7', fee: 900, students: 20 },
+            { name: 'Class 8', fee: 950, students: 20 }
+        ];
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeClassTable();
+            attachEventListeners();
+            updateAllCalculations();
+        });
+
+        // Initialize class fees table
+        function initializeClassTable() {
+            const tbody = document.getElementById('classFeesTable');
+            tbody.innerHTML = '';
+
+            classData.forEach((classItem, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${classItem.name}</strong></td>
+                    <td>
+                        <input type="number" 
+                               id="f${index + 1}" 
+                               class="form-input" 
+                               value="${classItem.fee}" 
+                               min="100" 
+                               max="10000" 
+                               step="50"
+                               aria-label="Fee for ${classItem.name}"
+                               onchange="updateClassCalculation(${index})">
+                    </td>
+                    <td>
+                        <input type="number" 
+                               id="s${index + 1}" 
+                               class="form-input" 
+                               value="${classItem.students}" 
+                               min="0" 
+                               max="100" 
+                               step="1"
+                               aria-label="Number of students in ${classItem.name}"
+                               onchange="updateClassCalculation(${index})">
+                    </td>
+                    <td>
+                        <input type="number" 
+                               id="r${index + 1}" 
+                               class="form-input" 
+                               value="${classItem.fee * classItem.students}" 
+                               readonly 
+                               aria-readonly="true"
+                               aria-label="Revenue for ${classItem.name}">
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Attach event listeners to all inputs
+        function attachEventListeners() {
+            // Staff expenses
+            ['teachers', 'salary', 'principal', 'guard', 'clerk', 'sweeper', 'other'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updateAllCalculations);
+            });
+
+            // Transport
+            ['tfee', 'tstudents', 'driver', 'fuel'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updateAllCalculations);
+            });
+
+            // Slider
+            document.getElementById('studentSlider').addEventListener('input', sliderCalc);
+        }
+
+        // Update individual class calculation
+        function updateClassCalculation(index) {
+            const fee = parseFloat(document.getElementById(`f${index + 1}`).value) || 0;
+            const students = parseInt(document.getElementById(`s${index + 1}`).value) || 0;
+            const revenue = fee * students;
+            
+            document.getElementById(`r${index + 1}`).value = revenue;
+            
+            // Update class data
+            classData[index].fee = fee;
+            classData[index].students = students;
+            
+            updateClassTotals();
+            updateAllCalculations();
+        }
+
+        // Update class totals
+        function updateClassTotals() {
+            let totalStudents = 0;
+            let totalRevenue = 0;
+
+            classData.forEach(classItem => {
+                totalStudents += classItem.students;
+                totalRevenue += classItem.fee * classItem.students;
+            });
+
+            document.getElementById('totalStudents').value = totalStudents;
+            document.getElementById('totalRevenue').value = totalRevenue;
+        }
+
+        // Update all calculations
+        function updateAllCalculations() {
+            updateClassTotals();
+            busCalc();
+            sliderCalc();
+        }
+
+        // Main calculation function
+        function calculateFullScenario() {
+            updateAllCalculations();
+            
+            let totalStudents = 0;
+            let revenue = 0;
+
+            // Calculate class fees
+            classData.forEach(classItem => {
+                totalStudents += classItem.students;
+                revenue += classItem.fee * classItem.students;
+            });
+
+            // Staff expenses
+            const teachers = parseInt(document.getElementById('teachers').value) || 0;
+            const salary = parseFloat(document.getElementById('salary').value) || 0;
+            const principal = parseFloat(document.getElementById('principal').value) || 0;
+            const guard = parseFloat(document.getElementById('guard').value) || 0;
+            const clerk = parseFloat(document.getElementById('clerk').value) || 0;
+            const sweeper = parseFloat(document.getElementById('sweeper').value) || 0;
+            const other = parseFloat(document.getElementById('other').value) || 0;
+
+            const expenses = (teachers * salary) + principal + guard + clerk + sweeper + other;
+            const profit = revenue - expenses;
+            const avgFee = revenue / totalStudents;
+            const breakeven = Math.ceil(expenses / avgFee);
+
+            // Display results
+            document.getElementById('resultTotalStudents').textContent = totalStudents;
+            document.getElementById('resultRevenue').textContent = '₹' + revenue.toLocaleString();
+            document.getElementById('resultExpenses').textContent = '₹' + expenses.toLocaleString();
+            document.getElementById('resultProfit').textContent = '₹' + profit.toLocaleString();
+            document.getElementById('resultBreakEven').textContent = breakeven;
+            document.getElementById('resultAvgFee').textContent = '₹' + Math.round(avgFee);
+
+            const perClass = Math.ceil(breakeven / 9);
+            document.getElementById('suggestedPerClass').textContent = perClass;
+
+            // Show results section
+            document.getElementById('resultsSection').style.display = 'block';
+            
+            // Scroll to results
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Transport calculation
+        function busCalc() {
+            const fee = parseFloat(document.getElementById('tfee').value) || 0;
+            const students = parseInt(document.getElementById('tstudents').value) || 0;
+            const driver = parseFloat(document.getElementById('driver').value) || 0;
+            const fuel = parseFloat(document.getElementById('fuel').value) || 0;
+
+            const income = fee * students;
+            const cost = driver + fuel;
+            const profit = income - cost;
+
+            document.getElementById('transportIncome').textContent = '₹' + income.toLocaleString();
+            document.getElementById('transportCost').textContent = '₹' + cost.toLocaleString();
+            
+            const profitElement = document.getElementById('transportProfit');
+            profitElement.textContent = (profit >= 0 ? '₹' : '-₹') + Math.abs(profit).toLocaleString();
+            profitElement.style.color = profit >= 0 ? '#059669' : '#dc2626';
+        }
+
+        // Slider calculation
+        function sliderCalc() {
+            const students = parseInt(document.getElementById('studentSlider').value);
+            const avgFee = 700; // Average fee for slider calculation
+            const revenue = students * avgFee;
+            const expenses = 122000; // Fixed expenses for slider
+            const profit = revenue - expenses;
+
+            document.getElementById('sliderValue').textContent = students;
+            document.getElementById('sliderRevenue').textContent = '₹' + revenue.toLocaleString();
+            
+            const profitElement = document.getElementById('sliderProfit');
+            profitElement.textContent = (profit >= 0 ? '₹' : '-₹') + Math.abs(profit).toLocaleString();
+            profitElement.style.color = profit >= 0 ? '#059669' : '#dc2626';
+            
+            document.getElementById('sliderAvgFee').textContent = '₹' + avgFee;
+        }
+
+        // Utility functions
+        function formatCurrency(amount) {
+            return '₹' + amount.toLocaleString();
+        }
+
+        function validateInput(input) {
+            if (input.value < 0) input.value = 0;
+            if (input.max && input.value > input.max) input.value = input.max;
+        }
+
+        // Add input validation
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('blur', () => validateInput(input));
+        });
+
+        // Keyboard navigation support
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
+                const inputs = Array.from(document.querySelectorAll('input[type="number"]'));
+                const currentIndex = inputs.indexOf(e.target);
+                if (currentIndex < inputs.length - 1) {
+                    inputs[currentIndex + 1].focus();
+                } else {
+                    calculateFullScenario();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
