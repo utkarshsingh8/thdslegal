@@ -575,25 +575,43 @@
                     </div>
                 </div>
 
-                <div class="grid grid-2">
-                    <div class="form-group">
-                        <label class="form-label" for="tfee">Transport Fee per Student (₹)</label>
-                        <input type="number" id="tfee" class="form-input" value="500" min="100" step="50" aria-describedby="tfee-help">
-                        <small id="tfee-help" class="text-secondary">Monthly transport fee</small>
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" id="defaultTransport" checked onchange="toggleTransportConfig()"> Use shared Driver Salary & Fuel costs
+                    </label>
+                </div>
+
+                <div id="transportGroups">
+                    <div class="transport-group" id="transportGroup0" style="margin-bottom: 1rem; padding: 1rem; border: 1px solid var(--border-color); border-radius: 0.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h4>Transport Group 1</h4>
+                            <button type="button" onclick="removeTransportGroup(0)" style="background: #dc3545; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem;">×</button>
+                        </div>
+                        <div class="grid grid-2">
+                            <div class="form-group">
+                                <label class="form-label" for="tfee0">Transport Fee per Student (₹)</label>
+                                <input type="number" id="tfee0" class="form-input" value="500" min="100" step="50">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="tstudents0">Transport Students</label>
+                                <input type="number" id="tstudents0" class="form-input" value="30" min="0">
+                            </div>
+                        </div>
+                        <div class="grid grid-2 shared-costs">
+                            <div class="form-group">
+                                <label class="form-label" for="driver">Driver Salary (₹)</label>
+                                <input type="number" id="driver" class="form-input" value="12000" min="5000" step="1000" onchange="updateTransportCalculation()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="fuel">Fuel & Maintenance (₹)</label>
+                                <input type="number" id="fuel" class="form-input" value="15000" min="5000" step="1000" onchange="updateTransportCalculation()">
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label" for="tstudents">Transport Students</label>
-                        <input type="number" id="tstudents" class="form-input" value="30" min="0" max="100" aria-describedby="tstudents-help">
-                        <small id="tstudents-help" class="text-secondary">Students using transport</small>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="driver">Driver Salary (₹)</label>
-                        <input type="number" id="driver" class="form-input" value="12000" min="5000" step="1000">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="fuel">Fuel & Maintenance (₹)</label>
-                        <input type="number" id="fuel" class="form-input" value="15000" min="5000" step="1000">
-                    </div>
+                </div>
+
+                <div style="margin: 1rem 0;">
+                    <button type="button" onclick="addTransportGroup()" style="background: #28a745; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer;">+ Add Transport Group</button>
                 </div>
 
                 <div id="transportResult" class="results" style="margin-top: 1.5rem;">
@@ -607,7 +625,7 @@
                             <div class="result-label">Transport Cost</div>
                         </div>
                         <div class="result-item">
-                            <div class="result-value" id="transportProfit" style="color: #ffffff;">₹0</div>
+                            <div class="result-value" id="transportProfit" style="color: #00ff00;">₹0</div>
                             <div class="result-label">Transport Profit/Loss</div>
                         </div>
                     </div>
@@ -637,7 +655,7 @@
                             <div class="result-label">Monthly Revenue</div>
                         </div>
                         <div class="result-item">
-                            <div class="result-value" id="sliderProfit" style="color: #ffffff;">₹0</div>
+                            <div class="result-value" id="sliderProfit" style="color: #00ff00;">₹0</div>
                             <div class="result-label">Monthly Profit/Loss</div>
                         </div>
                         <div class="result-item">
@@ -675,7 +693,7 @@
                         <div class="result-label">Monthly Expenses</div>
                     </div>
                     <div class="result-item">
-                        <div class="result-value" id="resultProfit" style="color: #ffffff;">₹22,000</div>
+                        <div class="result-value" id="resultProfit" style="color: #00ff00;">₹22,000</div>
                         <div class="result-label">Monthly Profit</div>
                     </div>
                     <div class="result-item">
@@ -717,9 +735,18 @@
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM Content Loaded - Initializing application');
+            
+            // Test if buttons exist
+            const calcButton = document.querySelector('button[onclick="calculateFullScenario()"]');
+            const testButton = document.querySelector('button[onclick="validateAllCalculations()"]');
+            console.log('Calculate button found:', calcButton);
+            console.log('Test button found:', testButton);
+            
             initializeClassTable();
             attachEventListeners();
             initializeAllCalculations(); // This will calculate all initial values
+            console.log('Application initialization complete');
         });
 
         // Initialize class fees table
@@ -780,17 +807,204 @@
                 });
             });
 
-            // Transport - make them update transport calculation
-            ['tfee', 'tstudents', 'driver', 'fuel'].forEach(id => {
+            // Transport - initialize first group
+            if (document.getElementById('tfee0')) {
+                document.getElementById('tfee0').addEventListener('input', updateTransportCalculation);
+                document.getElementById('tstudents0').addEventListener('input', updateTransportCalculation);
+            }
+            if (document.getElementById('defaultTransport')) {
+                document.getElementById('defaultTransport').addEventListener('change', toggleTransportConfig);
+            }
+
+            // Transport shared costs
+            ['driver', 'fuel'].forEach(id => {
                 document.getElementById(id).addEventListener('input', function() {
-                    busCalc();
+                    updateTransportCalculation();
                     // Update slider with new transport data
                     updateSliderWithDynamicExpenses();
                 });
             });
 
+            // Initialize transport calculations
+            if (document.getElementById('defaultTransport')) {
+                // Delay to ensure DOM is ready
+                setTimeout(() => {
+                    toggleTransportConfig();
+                }, 100);
+            }
+
+            // Button event listeners
+            const calcButton = document.querySelector('button[onclick="calculateFullScenario()"]');
+            const testButton = document.querySelector('button[onclick="validateAllCalculations()"]');
+            
+            if (calcButton) {
+                calcButton.removeAttribute('onclick');
+                calcButton.addEventListener('click', calculateFullScenario);
+            }
+            
+            if (testButton) {
+                testButton.removeAttribute('onclick');
+                testButton.addEventListener('click', validateAllCalculations);
+            }
+
             // Slider
             document.getElementById('studentSlider').addEventListener('input', sliderCalc);
+        }
+
+        let transportGroupCount = 1;
+
+        // Toggle between shared and individual transport costs
+        function toggleTransportConfig() {
+            const isDefault = document.getElementById('defaultTransport').checked;
+            const groups = document.querySelectorAll('.transport-group');
+            
+            groups.forEach((group, index) => {
+                const sharedCosts = group.querySelector('.shared-costs');
+                const individualCosts = group.querySelector('.individual-costs');
+                
+                if (isDefault) {
+                    // Show shared costs, hide individual
+                    if (sharedCosts) sharedCosts.style.display = 'grid';
+                    if (individualCosts) individualCosts.style.display = 'none';
+                } else {
+                    // Hide shared costs, show individual
+                    if (sharedCosts) sharedCosts.style.display = 'none';
+                    if (individualCosts) individualCosts.style.display = 'grid';
+                }
+            });
+            
+            // Only update calculations if we have transport groups
+            if (groups.length > 0) {
+                updateTransportCalculation();
+            }
+        }
+
+        // Add new transport group
+        function addTransportGroup() {
+            const container = document.getElementById('transportGroups');
+            const newGroup = document.createElement('div');
+            newGroup.className = 'transport-group';
+            newGroup.id = `transportGroup${transportGroupCount}`;
+            newGroup.style.cssText = 'margin-bottom: 1rem; padding: 1rem; border: 1px solid var(--border-color); border-radius: 0.5rem;';
+            
+            const isDefault = document.getElementById('defaultTransport').checked;
+            
+            newGroup.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h4>Transport Group ${transportGroupCount + 1}</h4>
+                    <button type="button" onclick="removeTransportGroup(${transportGroupCount})" style="background: #dc3545; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem;">×</button>
+                </div>
+                <div class="grid grid-2">
+                    <div class="form-group">
+                        <label class="form-label" for="tfee${transportGroupCount}">Transport Fee per Student (₹)</label>
+                        <input type="number" id="tfee${transportGroupCount}" class="form-input" value="500" min="100" step="50">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="tstudents${transportGroupCount}">Transport Students</label>
+                        <input type="number" id="tstudents${transportGroupCount}" class="form-input" value="30" min="0">
+                    </div>
+                </div>
+                <div class="grid grid-2 shared-costs" style="${isDefault ? 'display: grid;' : 'display: none;'}">
+                    <div class="form-group">
+                        <label class="form-label" for="driver">Driver Salary (₹)</label>
+                        <input type="number" id="driver" class="form-input" value="12000" min="5000" step="1000" onchange="updateTransportCalculation()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="fuel">Fuel & Maintenance (₹)</label>
+                        <input type="number" id="fuel" class="form-input" value="15000" min="5000" step="1000" onchange="updateTransportCalculation()">
+                    </div>
+                </div>
+                <div class="grid grid-2 individual-costs" style="${!isDefault ? 'display: grid;' : 'display: none;'}">
+                    <div class="form-group">
+                        <label class="form-label" for="driver${transportGroupCount}">Driver Salary (₹)</label>
+                        <input type="number" id="driver${transportGroupCount}" class="form-input" value="12000" min="5000" step="1000" onchange="updateTransportCalculation()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="fuel${transportGroupCount}">Fuel & Maintenance (₹)</label>
+                        <input type="number" id="fuel${transportGroupCount}" class="form-input" value="15000" min="5000" step="1000" onchange="updateTransportCalculation()">
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(newGroup);
+            transportGroupCount++;
+            updateTransportCalculation();
+        }
+
+        // Remove transport group
+        function removeTransportGroup(index) {
+            if (document.querySelectorAll('.transport-group').length <= 1) {
+                alert('Cannot remove the last transport group');
+                return;
+            }
+            
+            const group = document.getElementById(`transportGroup${index}`);
+            if (group) {
+                group.remove();
+                updateTransportCalculation();
+            }
+        }
+
+        // Update transport calculations for all groups
+        function updateTransportCalculation() {
+            console.log('updateTransportCalculation called');
+            const isDefault = document.getElementById('defaultTransport').checked;
+            let totalIncome = 0;
+            let totalCost = 0;
+            
+            document.querySelectorAll('.transport-group').forEach((group, index) => {
+                const groupId = group.id.replace('transportGroup', '');
+                const feeElement = document.getElementById(`tfee${groupId}`);
+                const studentsElement = document.getElementById(`tstudents${groupId}`);
+                
+                if (!feeElement || !studentsElement) {
+                    return;
+                }
+                
+                console.log(`Group ${groupId}: feeElement.value = ${feeElement.value}, studentsElement.value = ${studentsElement.value}`);
+                
+                const fee = parseFloat(feeElement.value) || 0;
+                const students = parseInt(studentsElement.value) || 0;
+                
+                totalIncome += fee * students;
+                
+                if (isDefault) {
+                    // Shared costs - only add once for the first group
+                    if (index === 0) {
+                        const driver = parseFloat(document.getElementById('driver').value) || 0;
+                        const fuel = parseFloat(document.getElementById('fuel').value) || 0;
+                        totalCost += driver + fuel;
+                    }
+                } else {
+                    // Individual costs for each group
+                    const driverElement = document.getElementById(`driver${groupId}`);
+                    const fuelElement = document.getElementById(`fuel${groupId}`);
+                    
+                    if (!driverElement || !fuelElement) {
+                        return;
+                    }
+                    
+                    const driver = parseFloat(driverElement.value) || 0;
+                    const fuel = parseFloat(fuelElement.value) || 0;
+                    totalCost += driver + fuel;
+                }
+            });
+            
+            const profit = totalIncome - totalCost;
+            
+            document.getElementById('transportIncome').textContent = '₹' + totalIncome.toLocaleString();
+            document.getElementById('transportCost').textContent = '₹' + totalCost.toLocaleString();
+            
+            const profitElement = document.getElementById('transportProfit');
+            profitElement.textContent = (profit >= 0 ? '₹' : '-₹') + Math.abs(profit).toLocaleString();
+            profitElement.style.color = '#00ff00'; // Green for profit
+            
+            return { income: totalIncome, cost: totalCost, profit: profit };
+        }
+
+        // Legacy busCalc function - now just calls updateTransportCalculation
+        function busCalc() {
+            return updateTransportCalculation();
         }
 
         // Update total expenses calculation
@@ -850,69 +1064,69 @@
 
         // Action Button - Calculate Complete Financial Scenario
         function calculateFullScenario() {
-            // Validate calculations first
-            const validation = validateAllCalculations();
-            if (validation.errors.length > 0) {
-                console.warn('Calculation validation failed:', validation.errors);
+            console.log('Calculate Complete Financial Scenario button clicked');
+            
+            try {
+                // Validate calculations first
+                const validation = validateAllCalculations();
+                if (validation.errors.length > 0) {
+                    console.warn('Calculation validation failed:', validation.errors);
+                }
+                
+                // Calculate everything fresh
+                updateClassTotals();
+                const totalExpenses = updateTotalExpenses();
+                
+                // Test transport calculation
+                console.log('Testing transport calculation...');
+                const transportResult = updateTransportCalculation();
+                console.log('Transport result:', transportResult);
+                
+                let totalStudents = 0;
+                let revenue = 0;
+
+                // Calculate class fees
+                classData.forEach(classItem => {
+                    const index = classData.indexOf(classItem) + 1;
+                    const fee = parseFloat(document.getElementById(`f${index}`).value) || 0;
+                    const students = parseInt(document.getElementById(`s${index}`).value) || 0;
+                    totalStudents += students;
+                    revenue += fee * students;
+                });
+
+                const profit = revenue - totalExpenses;
+                const avgFee = totalStudents > 0 ? revenue / totalStudents : 0;
+                const breakeven = totalExpenses > 0 && avgFee > 0 ? Math.ceil(totalExpenses / avgFee) : 0;
+
+                // Display results
+                document.getElementById('resultTotalStudents').textContent = totalStudents;
+                document.getElementById('resultRevenue').textContent = '₹' + revenue.toLocaleString();
+                document.getElementById('resultExpenses').textContent = '₹' + totalExpenses.toLocaleString();
+                document.getElementById('resultProfit').textContent = '₹' + profit.toLocaleString();
+                document.getElementById('resultBreakEven').textContent = breakeven;
+                document.getElementById('resultAvgFee').textContent = '₹' + Math.round(avgFee);
+
+                const perClass = breakeven > 0 ? Math.ceil(breakeven / 9) : 0;
+                document.getElementById('suggestedPerClass').textContent = perClass;
+
+                // Show results section
+                document.getElementById('resultsSection').style.display = 'block';
+                
+                // Scroll to results
+                document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+                
+                console.log('Calculation completed successfully!');
+                
+            } catch (error) {
+                console.error('Error in calculateFullScenario:', error);
+                alert('Error in calculation: ' + error.message);
             }
-            
-            // Calculate everything fresh
-            updateClassTotals();
-            const totalExpenses = updateTotalExpenses();
-            busCalc();
-            
-            let totalStudents = 0;
-            let revenue = 0;
-
-            // Calculate class fees
-            classData.forEach(classItem => {
-                const fee = parseFloat(document.getElementById(`f${classData.indexOf(classItem) + 1}`).value) || 0;
-                const students = parseInt(document.getElementById(`s${classData.indexOf(classItem) + 1}`).value) || 0;
-                totalStudents += students;
-                revenue += fee * students;
-            });
-
-            const profit = revenue - totalExpenses;
-            const avgFee = totalStudents > 0 ? revenue / totalStudents : 0;
-            const breakeven = totalExpenses > 0 && avgFee > 0 ? Math.ceil(totalExpenses / avgFee) : 0;
-
-            // Display results
-            document.getElementById('resultTotalStudents').textContent = totalStudents;
-            document.getElementById('resultRevenue').textContent = '₹' + revenue.toLocaleString();
-            document.getElementById('resultExpenses').textContent = '₹' + totalExpenses.toLocaleString();
-            document.getElementById('resultProfit').textContent = '₹' + profit.toLocaleString();
-            document.getElementById('resultBreakEven').textContent = breakeven;
-            document.getElementById('resultAvgFee').textContent = '₹' + Math.round(avgFee);
-
-            const perClass = breakeven > 0 ? Math.ceil(breakeven / 9) : 0;
-            document.getElementById('suggestedPerClass').textContent = perClass;
-
-            // Show results section
-            document.getElementById('resultsSection').style.display = 'block';
-            
-            // Scroll to results
-            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
         }
 
         // Transport calculation with live updates
         function busCalc() {
-            const fee = parseFloat(document.getElementById('tfee').value) || 0;
-            const students = parseInt(document.getElementById('tstudents').value) || 0;
-            const driver = parseFloat(document.getElementById('driver').value) || 0;
-            const fuel = parseFloat(document.getElementById('fuel').value) || 0;
-
-            const income = fee * students;
-            const cost = driver + fuel;
-            const profit = income - cost;
-
-            document.getElementById('transportIncome').textContent = '₹' + income.toLocaleString();
-            document.getElementById('transportCost').textContent = '₹' + cost.toLocaleString();
-            
-            const profitElement = document.getElementById('transportProfit');
-            profitElement.textContent = (profit >= 0 ? '₹' : '-₹') + Math.abs(profit).toLocaleString();
-            profitElement.style.color = '#ffffff';
-
-            return { income, cost, profit };
+            // Use the multi-group calculation system
+            return updateTransportCalculation();
         }
 
         // Slider calculation with dynamic expenses and average fee
@@ -940,7 +1154,7 @@
             
             const profitElement = document.getElementById('sliderProfit');
             profitElement.textContent = (profit >= 0 ? '₹' : '-₹') + Math.abs(profit).toLocaleString();
-            profitElement.style.color = '#ffffff';
+            profitElement.style.color = '#00ff00'; // Green for profit
             
             document.getElementById('sliderAvgFee').textContent = '₹' + Math.round(avgFee);
         }
@@ -948,10 +1162,14 @@
         // Update slider with dynamic expenses
         function updateSliderWithDynamicExpenses() {
             sliderCalc();
+            // Also update transport calculations
+            updateTransportCalculation();
         }
 
         // Comprehensive validation of all calculations
         function validateAllCalculations() {
+            console.log('Test All Calculations button clicked');
+            alert('Test All Calculations clicked!');
             console.log('🔍 VALIDATING ALL CALCULATIONS...');
             
             let errors = [];
@@ -1006,14 +1224,34 @@
             
             // 3. Transport Validation
             console.log('3. Validating Transport...');
-            const tfee = parseFloat(document.getElementById('tfee').value) || 0;
-            const tstu = parseInt(document.getElementById('tstudents').value) || 0;
-            const driver = parseFloat(document.getElementById('driver').value) || 0;
-            const fuel = parseFloat(document.getElementById('fuel').value) || 0;
+            const defaultTransportElement = document.getElementById('defaultTransport');
+            const isDefault = defaultTransportElement ? defaultTransportElement.checked : true;
+            let calculatedTransportIncome = 0;
+            let calculatedTransportCost = 0;
             
-            const transportIncome = tfee * tstu;
-            const transportCost = driver + fuel;
-            const transportProfit = transportIncome - transportCost;
+            // Calculate for all transport groups
+            document.querySelectorAll('.transport-group').forEach((group, index) => {
+                const groupId = group.id.replace('transportGroup', '');
+                const fee = parseFloat(document.getElementById(`tfee${groupId}`).value) || 0;
+                const students = parseInt(document.getElementById(`tstudents${groupId}`).value) || 0;
+                calculatedTransportIncome += fee * students;
+                
+                if (isDefault) {
+                    // Shared costs - only add once for the first group
+                    if (index === 0) {
+                        const driver = parseFloat(document.getElementById('driver').value) || 0;
+                        const fuel = parseFloat(document.getElementById('fuel').value) || 0;
+                        calculatedTransportCost += driver + fuel;
+                    }
+                } else {
+                    // Individual costs for each group
+                    const driver = parseFloat(document.getElementById(`driver${groupId}`).value) || 0;
+                    const fuel = parseFloat(document.getElementById(`fuel${groupId}`).value) || 0;
+                    calculatedTransportCost += driver + fuel;
+                }
+            });
+            
+            const calculatedTransportProfit = calculatedTransportIncome - calculatedTransportCost;
             
             const displayedTransportIncome = document.getElementById('transportIncome').textContent;
             const displayedTransportCost = document.getElementById('transportCost').textContent;
@@ -1029,16 +1267,16 @@
             const displayedCost = parseCurrency(displayedTransportCost);
             const displayedProf = parseCurrency(displayedTransportProfit);
             
-            if (Math.abs(transportIncome - displayedInc) > 0.01) {
-                errors.push(`Transport Income: Calculation mismatch. Calculated: ₹${transportIncome}, Displayed: ${displayedTransportIncome}`);
+            if (Math.abs(calculatedTransportIncome - displayedInc) > 0.01) {
+                errors.push(`Transport Income: Calculation mismatch. Calculated: ₹${calculatedTransportIncome}, Displayed: ${displayedTransportIncome}`);
             }
             
-            if (Math.abs(transportCost - displayedCost) > 0.01) {
-                errors.push(`Transport Cost: Calculation mismatch. Calculated: ₹${transportCost}, Displayed: ${displayedTransportCost}`);
+            if (Math.abs(calculatedTransportCost - displayedCost) > 0.01) {
+                errors.push(`Transport Cost: Calculation mismatch. Calculated: ₹${calculatedTransportCost}, Displayed: ${displayedTransportCost}`);
             }
             
-            if (Math.abs(transportProfit - displayedProf) > 0.01) {
-                errors.push(`Transport Profit: Calculation mismatch. Calculated: ₹${transportProfit}, Displayed: ${displayedTransportProfit}`);
+            if (Math.abs(calculatedTransportProfit - displayedProf) > 0.01) {
+                errors.push(`Transport Profit: Calculation mismatch. Calculated: ₹${calculatedTransportProfit}, Displayed: ${displayedTransportProfit}`);
             }
             
             // 4. Slider Validation
@@ -1127,14 +1365,71 @@
             // Slider verification
             sliderCalc();
             
+            // Slider verification
+            sliderCalc();
+            
             console.log('=== CROSS-CHECK COMPLETE ===');
+        }
+
+        // Action Button - Calculate Complete Financial Scenario
+        function calculateFullScenario() {
+            console.log('Calculate Complete Financial Scenario button clicked');
+            alert('Calculate Complete Financial Scenario clicked!');
+            
+            // Validate calculations first
+            const validation = validateAllCalculations();
+            if (validation.errors.length > 0) {
+                console.warn('Calculation validation failed:', validation.errors);
+            }
+            
+            // Calculate everything fresh
+            updateClassTotals();
+            const totalExpenses = updateTotalExpenses();
+            updateTransportCalculation();
+            
+            let totalStudents = 0;
+            let revenue = 0;
+
+            // Calculate class fees
+            classData.forEach(classItem => {
+                const fee = parseFloat(document.getElementById(`f${classData.indexOf(classItem) + 1}`).value) || 0;
+                const students = parseInt(document.getElementById(`s${classData.indexOf(classItem) + 1}`).value) || 0;
+                totalStudents += students;
+                revenue += fee * students;
+            });
+
+            const profit = revenue - totalExpenses;
+            const avgFee = totalStudents > 0 ? revenue / totalStudents : 0;
+            const breakeven = totalExpenses > 0 && avgFee > 0 ? Math.ceil(totalExpenses / avgFee) : 0;
+
+            // Display results
+            document.getElementById('resultTotalStudents').textContent = totalStudents;
+            document.getElementById('resultRevenue').textContent = '₹' + revenue.toLocaleString();
+            document.getElementById('resultExpenses').textContent = '₹' + totalExpenses.toLocaleString();
+            document.getElementById('resultProfit').textContent = '₹' + profit.toLocaleString();
+            document.getElementById('resultBreakEven').textContent = breakeven;
+            document.getElementById('resultAvgFee').textContent = '₹' + Math.round(avgFee);
+
+            const perClass = breakeven > 0 ? Math.ceil(breakeven / 9) : 0;
+            document.getElementById('suggestedPerClass').textContent = perClass;
+
+            // Show results section
+            document.getElementById('resultsSection').style.display = 'block';
+            
+            // Scroll to results
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
         }
 
         // Initialize all calculations
         function initializeAllCalculations() {
             updateClassTotals();
             updateTotalExpenses();
-            busCalc();
+            
+            // Only run transport calculation if elements exist
+            if (document.getElementById('tfee0')) {
+                updateTransportCalculation();
+            }
+            
             sliderCalc();
         }
 
@@ -1147,8 +1442,12 @@
             if (input.max && input.value > input.max) input.value = input.max;
         }
 
-        // Add input validation
+        // Add input validation - only for specific inputs, not transport students
         document.querySelectorAll('input[type="number"]').forEach(input => {
+            // Skip transport students inputs to avoid the max=100 constraint
+            if (input.id && input.id.startsWith('tstudents')) {
+                return;
+            }
             input.addEventListener('blur', () => validateInput(input));
         });
 
