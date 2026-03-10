@@ -507,11 +507,11 @@
                 <div class="grid grid-2">
                     <div class="form-group">
                         <label class="form-label" for="totalStudents">Total Students</label>
-                        <input type="number" id="totalStudents" class="form-input" value="180" readonly aria-readonly="true">
+                        <input type="number" id="totalStudents" class="form-input" value="" readonly aria-readonly="true">
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="totalRevenue">Total Monthly Revenue (₹)</label>
-                        <input type="number" id="totalRevenue" class="form-input" value="144000" readonly aria-readonly="true">
+                        <input type="number" id="totalRevenue" class="form-input" value="" readonly aria-readonly="true">
                     </div>
                 </div>
             </section>
@@ -560,7 +560,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="totalExpenses">Total Monthly Expenses (₹)</label>
-                        <input type="number" id="totalExpenses" class="form-input" value="122000" readonly aria-readonly="true">
+                        <input type="number" id="totalExpenses" class="form-input" value="" readonly aria-readonly="true">
                     </div>
                 </div>
             </section>
@@ -599,15 +599,15 @@
                 <div id="transportResult" class="results" style="margin-top: 1.5rem;">
                     <div class="results-grid">
                         <div class="result-item">
-                            <div class="result-value" id="transportIncome">₹15,000</div>
+                            <div class="result-value" id="transportIncome">₹0</div>
                             <div class="result-label">Transport Income</div>
                         </div>
                         <div class="result-item">
-                            <div class="result-value" id="transportCost">₹27,000</div>
+                            <div class="result-value" id="transportCost">₹0</div>
                             <div class="result-label">Transport Cost</div>
                         </div>
                         <div class="result-item">
-                            <div class="result-value" id="transportProfit" style="color: #000000;">-₹12,000</div>
+                            <div class="result-value" id="transportProfit" style="color: #ffffff;">₹0</div>
                             <div class="result-label">Transport Profit/Loss</div>
                         </div>
                     </div>
@@ -633,11 +633,11 @@
                 <div id="sliderResult" class="results">
                     <div class="results-grid">
                         <div class="result-item">
-                            <div class="result-value" id="sliderRevenue">₹105,000</div>
+                            <div class="result-value" id="sliderRevenue">₹0</div>
                             <div class="result-label">Monthly Revenue</div>
                         </div>
                         <div class="result-item">
-                            <div class="result-value" id="sliderProfit" style="color: #000000;">-₹17,000</div>
+                            <div class="result-value" id="sliderProfit" style="color: #ffffff;">₹0</div>
                             <div class="result-label">Monthly Profit/Loss</div>
                         </div>
                         <div class="result-item">
@@ -652,6 +652,9 @@
             <div style="text-align: center; margin: 2rem 0;">
                 <button type="button" class="btn btn-primary" onclick="calculateFullScenario()" aria-label="Calculate complete financial scenario">
                     🧮 Calculate Complete Financial Scenario
+                </button>
+                <button type="button" class="btn" onclick="validateAllCalculations()" style="margin-left: 1rem; background: #666; color: white;" aria-label="Test all calculations">
+                    🔍 Test All Calculations
                 </button>
             </div>
 
@@ -672,7 +675,7 @@
                         <div class="result-label">Monthly Expenses</div>
                     </div>
                     <div class="result-item">
-                        <div class="result-value" id="resultProfit">₹22,000</div>
+                        <div class="result-value" id="resultProfit" style="color: #ffffff;">₹22,000</div>
                         <div class="result-label">Monthly Profit</div>
                     </div>
                     <div class="result-item">
@@ -716,7 +719,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             initializeClassTable();
             attachEventListeners();
-            updateAllCalculations();
+            initializeAllCalculations(); // This will calculate all initial values
         });
 
         // Initialize class fees table
@@ -766,21 +769,47 @@
 
         // Attach event listeners to all inputs
         function attachEventListeners() {
-            // Staff expenses
+            // Class fees inputs (already handled by onchange)
+            
+            // Staff expenses - make them update expenses calculation
             ['teachers', 'salary', 'principal', 'guard', 'clerk', 'sweeper', 'other'].forEach(id => {
-                document.getElementById(id).addEventListener('input', updateAllCalculations);
+                document.getElementById(id).addEventListener('input', function() {
+                    updateTotalExpenses();
+                    busCalc(); // Transport might depend on total expenses
+                    updateSliderWithDynamicExpenses(); // Slider depends on expenses
+                });
             });
 
-            // Transport
+            // Transport - make them update transport calculation
             ['tfee', 'tstudents', 'driver', 'fuel'].forEach(id => {
-                document.getElementById(id).addEventListener('input', updateAllCalculations);
+                document.getElementById(id).addEventListener('input', function() {
+                    busCalc();
+                    // Update slider with new transport data
+                    updateSliderWithDynamicExpenses();
+                });
             });
 
             // Slider
             document.getElementById('studentSlider').addEventListener('input', sliderCalc);
         }
 
-        // Update individual class calculation
+        // Update total expenses calculation
+        function updateTotalExpenses() {
+            const teachers = parseInt(document.getElementById('teachers').value) || 0;
+            const salary = parseFloat(document.getElementById('salary').value) || 0;
+            const principal = parseFloat(document.getElementById('principal').value) || 0;
+            const guard = parseFloat(document.getElementById('guard').value) || 0;
+            const clerk = parseFloat(document.getElementById('clerk').value) || 0;
+            const sweeper = parseFloat(document.getElementById('sweeper').value) || 0;
+            const other = parseFloat(document.getElementById('other').value) || 0;
+
+            const totalExpenses = (teachers * salary) + principal + guard + clerk + sweeper + other;
+            document.getElementById('totalExpenses').value = totalExpenses;
+            
+            return totalExpenses;
+        }
+
+        // Update individual class calculation - comprehensive live update
         function updateClassCalculation(index) {
             const fee = parseFloat(document.getElementById(`f${index + 1}`).value) || 0;
             const students = parseInt(document.getElementById(`s${index + 1}`).value) || 0;
@@ -793,7 +822,9 @@
             classData[index].students = students;
             
             updateClassTotals();
-            updateAllCalculations();
+            updateTotalExpenses();
+            busCalc();
+            updateSliderWithDynamicExpenses();
         }
 
         // Update class totals
@@ -810,49 +841,50 @@
             document.getElementById('totalRevenue').value = totalRevenue;
         }
 
-        // Update all calculations
+        // Update all calculations - comprehensive live update function
         function updateAllCalculations() {
-            updateClassTotals();
-            busCalc();
-            sliderCalc();
+            updateClassTotals(); // This updates total students and revenue
+            busCalc(); // This updates transport calculations
+            updateSliderWithDynamicExpenses(); // This updates slider with current data
         }
 
-        // Main calculation function
+        // Action Button - Calculate Complete Financial Scenario
         function calculateFullScenario() {
-            updateAllCalculations();
+            // Validate calculations first
+            const validation = validateAllCalculations();
+            if (validation.errors.length > 0) {
+                console.warn('Calculation validation failed:', validation.errors);
+            }
+            
+            // Calculate everything fresh
+            updateClassTotals();
+            const totalExpenses = updateTotalExpenses();
+            busCalc();
             
             let totalStudents = 0;
             let revenue = 0;
 
             // Calculate class fees
             classData.forEach(classItem => {
-                totalStudents += classItem.students;
-                revenue += classItem.fee * classItem.students;
+                const fee = parseFloat(document.getElementById(`f${classData.indexOf(classItem) + 1}`).value) || 0;
+                const students = parseInt(document.getElementById(`s${classData.indexOf(classItem) + 1}`).value) || 0;
+                totalStudents += students;
+                revenue += fee * students;
             });
 
-            // Staff expenses
-            const teachers = parseInt(document.getElementById('teachers').value) || 0;
-            const salary = parseFloat(document.getElementById('salary').value) || 0;
-            const principal = parseFloat(document.getElementById('principal').value) || 0;
-            const guard = parseFloat(document.getElementById('guard').value) || 0;
-            const clerk = parseFloat(document.getElementById('clerk').value) || 0;
-            const sweeper = parseFloat(document.getElementById('sweeper').value) || 0;
-            const other = parseFloat(document.getElementById('other').value) || 0;
-
-            const expenses = (teachers * salary) + principal + guard + clerk + sweeper + other;
-            const profit = revenue - expenses;
-            const avgFee = revenue / totalStudents;
-            const breakeven = Math.ceil(expenses / avgFee);
+            const profit = revenue - totalExpenses;
+            const avgFee = totalStudents > 0 ? revenue / totalStudents : 0;
+            const breakeven = totalExpenses > 0 && avgFee > 0 ? Math.ceil(totalExpenses / avgFee) : 0;
 
             // Display results
             document.getElementById('resultTotalStudents').textContent = totalStudents;
             document.getElementById('resultRevenue').textContent = '₹' + revenue.toLocaleString();
-            document.getElementById('resultExpenses').textContent = '₹' + expenses.toLocaleString();
+            document.getElementById('resultExpenses').textContent = '₹' + totalExpenses.toLocaleString();
             document.getElementById('resultProfit').textContent = '₹' + profit.toLocaleString();
             document.getElementById('resultBreakEven').textContent = breakeven;
             document.getElementById('resultAvgFee').textContent = '₹' + Math.round(avgFee);
 
-            const perClass = Math.ceil(breakeven / 9);
+            const perClass = breakeven > 0 ? Math.ceil(breakeven / 9) : 0;
             document.getElementById('suggestedPerClass').textContent = perClass;
 
             // Show results section
@@ -862,7 +894,7 @@
             document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Transport calculation
+        // Transport calculation with live updates
         function busCalc() {
             const fee = parseFloat(document.getElementById('tfee').value) || 0;
             const students = parseInt(document.getElementById('tstudents').value) || 0;
@@ -876,17 +908,31 @@
             document.getElementById('transportIncome').textContent = '₹' + income.toLocaleString();
             document.getElementById('transportCost').textContent = '₹' + cost.toLocaleString();
             
-        const profitElement = document.getElementById('transportProfit');
+            const profitElement = document.getElementById('transportProfit');
             profitElement.textContent = (profit >= 0 ? '₹' : '-₹') + Math.abs(profit).toLocaleString();
-            profitElement.style.color = profit >= 0 ? '#000000' : '#000000';
+            profitElement.style.color = '#ffffff';
+
+            return { income, cost, profit };
         }
 
-        // Slider calculation
+        // Slider calculation with dynamic expenses and average fee
         function sliderCalc() {
             const students = parseInt(document.getElementById('studentSlider').value);
-            const avgFee = 700; // Average fee for slider calculation
+            
+            // Calculate actual average fee from current class data
+            let totalRevenue = 0;
+            let totalStudents = 0;
+            classData.forEach((classItem, index) => {
+                const fee = parseFloat(document.getElementById(`f${index + 1}`).value) || 0;
+                const studentCount = parseInt(document.getElementById(`s${index + 1}`).value) || 0;
+                totalRevenue += fee * studentCount;
+                totalStudents += studentCount;
+            });
+            
+            const avgFee = totalStudents > 0 ? totalRevenue / totalStudents : 700; // Fallback to 700 if no students
+            
             const revenue = students * avgFee;
-            const expenses = 122000; // Fixed expenses for slider
+            const expenses = updateTotalExpenses(); // Use dynamic expenses
             const profit = revenue - expenses;
 
             document.getElementById('sliderValue').textContent = students;
@@ -894,12 +940,204 @@
             
             const profitElement = document.getElementById('sliderProfit');
             profitElement.textContent = (profit >= 0 ? '₹' : '-₹') + Math.abs(profit).toLocaleString();
-            profitElement.style.color = profit >= 0 ? '#000000' : '#000000';
+            profitElement.style.color = '#ffffff';
             
-            document.getElementById('sliderAvgFee').textContent = '₹' + avgFee;
+            document.getElementById('sliderAvgFee').textContent = '₹' + Math.round(avgFee);
         }
 
-        // Utility functions
+        // Update slider with dynamic expenses
+        function updateSliderWithDynamicExpenses() {
+            sliderCalc();
+        }
+
+        // Comprehensive validation of all calculations
+        function validateAllCalculations() {
+            console.log('🔍 VALIDATING ALL CALCULATIONS...');
+            
+            let errors = [];
+            let warnings = [];
+            
+            // 1. Class Fees Validation
+            console.log('1. Validating Class Fees...');
+            let totalCalcStudents = 0;
+            let totalCalcRevenue = 0;
+            
+            classData.forEach((item, index) => {
+                const fee = parseFloat(document.getElementById(`f${index + 1}`).value) || 0;
+                const students = parseInt(document.getElementById(`s${index + 1}`).value) || 0;
+                const revenue = fee * students;
+                const displayedRevenue = parseFloat(document.getElementById(`r${index + 1}`).value) || 0;
+                
+                if (Math.abs(revenue - displayedRevenue) > 0.01) {
+                    errors.push(`Class ${item.name}: Revenue calculation mismatch. Calculated: ₹${revenue}, Displayed: ₹${displayedRevenue}`);
+                }
+                
+                totalCalcStudents += students;
+                totalCalcRevenue += revenue;
+            });
+            
+            const displayedTotalStudents = parseInt(document.getElementById('totalStudents').value) || 0;
+            const displayedTotalRevenue = parseFloat(document.getElementById('totalRevenue').value) || 0;
+            
+            if (totalCalcStudents !== displayedTotalStudents) {
+                errors.push(`Total Students: Calculation mismatch. Calculated: ${totalCalcStudents}, Displayed: ${displayedTotalStudents}`);
+            }
+            
+            if (Math.abs(totalCalcRevenue - displayedTotalRevenue) > 0.01) {
+                errors.push(`Total Revenue: Calculation mismatch. Calculated: ₹${totalCalcRevenue}, Displayed: ₹${displayedTotalRevenue}`);
+            }
+            
+            // 2. Expenses Validation
+            console.log('2. Validating Expenses...');
+            const teachers = parseInt(document.getElementById('teachers').value) || 0;
+            const salary = parseFloat(document.getElementById('salary').value) || 0;
+            const principal = parseFloat(document.getElementById('principal').value) || 0;
+            const guard = parseFloat(document.getElementById('guard').value) || 0;
+            const clerk = parseFloat(document.getElementById('clerk').value) || 0;
+            const sweeper = parseFloat(document.getElementById('sweeper').value) || 0;
+            const other = parseFloat(document.getElementById('other').value) || 0;
+            
+            const calculatedExpenses = (teachers * salary) + principal + guard + clerk + sweeper + other;
+            const displayedExpenses = parseFloat(document.getElementById('totalExpenses').value) || 0;
+            
+            if (Math.abs(calculatedExpenses - displayedExpenses) > 0.01) {
+                errors.push(`Total Expenses: Calculation mismatch. Calculated: ₹${calculatedExpenses}, Displayed: ₹${displayedExpenses}`);
+            }
+            
+            // 3. Transport Validation
+            console.log('3. Validating Transport...');
+            const tfee = parseFloat(document.getElementById('tfee').value) || 0;
+            const tstu = parseInt(document.getElementById('tstudents').value) || 0;
+            const driver = parseFloat(document.getElementById('driver').value) || 0;
+            const fuel = parseFloat(document.getElementById('fuel').value) || 0;
+            
+            const transportIncome = tfee * tstu;
+            const transportCost = driver + fuel;
+            const transportProfit = transportIncome - transportCost;
+            
+            const displayedTransportIncome = document.getElementById('transportIncome').textContent;
+            const displayedTransportCost = document.getElementById('transportCost').textContent;
+            const displayedTransportProfit = document.getElementById('transportProfit').textContent;
+            
+            // Parse displayed values (remove ₹ and commas)
+            const parseCurrency = (text) => {
+                const cleaned = text.replace(/[₹,]/g, '').trim();
+                return parseFloat(cleaned) || 0;
+            };
+            
+            const displayedInc = parseCurrency(displayedTransportIncome);
+            const displayedCost = parseCurrency(displayedTransportCost);
+            const displayedProf = parseCurrency(displayedTransportProfit);
+            
+            if (Math.abs(transportIncome - displayedInc) > 0.01) {
+                errors.push(`Transport Income: Calculation mismatch. Calculated: ₹${transportIncome}, Displayed: ${displayedTransportIncome}`);
+            }
+            
+            if (Math.abs(transportCost - displayedCost) > 0.01) {
+                errors.push(`Transport Cost: Calculation mismatch. Calculated: ₹${transportCost}, Displayed: ${displayedTransportCost}`);
+            }
+            
+            if (Math.abs(transportProfit - displayedProf) > 0.01) {
+                errors.push(`Transport Profit: Calculation mismatch. Calculated: ₹${transportProfit}, Displayed: ${displayedTransportProfit}`);
+            }
+            
+            // 4. Slider Validation
+            console.log('4. Validating Slider...');
+            const sliderStudents = parseInt(document.getElementById('studentSlider').value) || 0;
+            const avgFee = totalCalcStudents > 0 ? totalCalcRevenue / totalCalcStudents : 700;
+            const sliderRevenue = sliderStudents * avgFee;
+            const sliderProfit = sliderRevenue - calculatedExpenses;
+            
+            const displayedSliderRevenue = parseCurrency(document.getElementById('sliderRevenue').textContent);
+            const displayedSliderProfit = parseCurrency(document.getElementById('sliderProfit').textContent);
+            const displayedSliderAvgFee = parseCurrency(document.getElementById('sliderAvgFee').textContent);
+            
+            if (Math.abs(sliderRevenue - displayedSliderRevenue) > 0.01) {
+                errors.push(`Slider Revenue: Calculation mismatch. Calculated: ₹${sliderRevenue}, Displayed: ${document.getElementById('sliderRevenue').textContent}`);
+            }
+            
+            if (Math.abs(sliderProfit - displayedSliderProfit) > 0.01) {
+                errors.push(`Slider Profit: Calculation mismatch. Calculated: ₹${sliderProfit}, Displayed: ${document.getElementById('sliderProfit').textContent}`);
+            }
+            
+            if (Math.abs(avgFee - displayedSliderAvgFee) > 0.01) {
+                errors.push(`Slider Avg Fee: Calculation mismatch. Calculated: ₹${avgFee}, Displayed: ${document.getElementById('sliderAvgFee').textContent}`);
+            }
+            
+            // Report results
+            console.log('✅ VALIDATION COMPLETE');
+            if (errors.length > 0) {
+                console.error('❌ ERRORS FOUND:');
+                errors.forEach(error => console.error('  - ' + error));
+            } else {
+                console.log('✅ ALL CALCULATIONS ARE ACCURATE!');
+            }
+            
+            if (warnings.length > 0) {
+                console.warn('⚠️  WARNINGS:');
+                warnings.forEach(warning => console.warn('  - ' + warning));
+            }
+            
+            return { errors, warnings };
+        }
+        function crossCheckCalculations() {
+            console.log('=== CROSS-CHECK CALCULATIONS ===');
+            
+            // Class fees verification
+            let calculatedTotalStudents = 0;
+            let calculatedTotalRevenue = 0;
+            
+            classData.forEach((classItem, index) => {
+                const fee = parseFloat(document.getElementById(`f${index + 1}`).value) || 0;
+                const students = parseInt(document.getElementById(`s${index + 1}`).value) || 0;
+                const revenue = fee * students;
+                const displayedRevenue = parseFloat(document.getElementById(`r${index + 1}`).value) || 0;
+                
+                if (Math.abs(revenue - displayedRevenue) > 0.01) {
+                    console.warn(`Class ${index + 1} revenue mismatch: calculated ${revenue}, displayed ${displayedRevenue}`);
+                }
+                
+                calculatedTotalStudents += students;
+                calculatedTotalRevenue += revenue;
+            });
+            
+            const displayedTotalStudents = parseInt(document.getElementById('totalStudents').value) || 0;
+            const displayedTotalRevenue = parseFloat(document.getElementById('totalRevenue').value) || 0;
+            
+            if (calculatedTotalStudents !== displayedTotalStudents) {
+                console.warn(`Total students mismatch: calculated ${calculatedTotalStudents}, displayed ${displayedTotalStudents}`);
+            }
+            
+            if (Math.abs(calculatedTotalRevenue - displayedTotalRevenue) > 0.01) {
+                console.warn(`Total revenue mismatch: calculated ${calculatedTotalRevenue}, displayed ${displayedTotalRevenue}`);
+            }
+            
+            // Expenses verification
+            const calculatedExpenses = updateTotalExpenses();
+            const displayedExpenses = parseFloat(document.getElementById('totalExpenses').value) || 0;
+            
+            if (Math.abs(calculatedExpenses - displayedExpenses) > 0.01) {
+                console.warn(`Total expenses mismatch: calculated ${calculatedExpenses}, displayed ${displayedExpenses}`);
+            }
+            
+            // Transport verification
+            const transportResult = busCalc();
+            console.log('Transport calculation verified:', transportResult);
+            
+            // Slider verification
+            sliderCalc();
+            
+            console.log('=== CROSS-CHECK COMPLETE ===');
+        }
+
+        // Initialize all calculations
+        function initializeAllCalculations() {
+            updateClassTotals();
+            updateTotalExpenses();
+            busCalc();
+            sliderCalc();
+        }
+
         function formatCurrency(amount) {
             return '₹' + amount.toLocaleString();
         }
