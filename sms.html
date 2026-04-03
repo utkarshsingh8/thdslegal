@@ -9,9 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
-*{
-    box-sizing:border-box;
-}
+*{box-sizing:border-box;}
 
 body{
     font-family:Arial;
@@ -20,12 +18,8 @@ body{
     background:#f5f5f5;
 }
 
-h2{
-    margin-top:0;
-    font-size:20px;
-}
+h2{margin-top:0;font-size:20px;}
 
-/* Controls container */
 .controls{
     background:white;
     padding:12px;
@@ -34,10 +28,7 @@ h2{
     box-shadow:0 2px 6px rgba(0,0,0,0.05);
 }
 
-/* Inputs */
-input[type="file"],
-select,
-textarea{
+input,select,textarea{
     width:100%;
     margin-top:6px;
     margin-bottom:10px;
@@ -51,7 +42,6 @@ textarea{
     font-size:14px;
 }
 
-/* Buttons */
 button{
     padding:10px 12px;
     background:#25D366;
@@ -63,14 +53,9 @@ button{
     margin:4px 4px 4px 0;
 }
 
-button:hover{
-    background:#128C7E;
-}
+button:hover{background:#128C7E;}
 
-/* Table wrapper */
-.table-wrapper{
-    overflow-x:auto;
-}
+.table-wrapper{overflow-x:auto;}
 
 table{
     border-collapse:collapse;
@@ -92,16 +77,9 @@ th{
     color:white;
 }
 
-/* MOBILE VIEW */
 @media(max-width:600px){
-
-    table, thead, tbody, th, td, tr{
-        display:block;
-    }
-
-    thead{
-        display:none;
-    }
+    table, thead, tbody, th, td, tr{display:block;}
+    thead{display:none;}
 
     tr{
         background:white;
@@ -111,10 +89,7 @@ th{
         box-shadow:0 2px 6px rgba(0,0,0,0.05);
     }
 
-    td{
-        border:none;
-        padding:6px 0;
-    }
+    td{border:none;padding:6px 0;}
 
     td::before{
         font-weight:bold;
@@ -127,9 +102,7 @@ th{
     td:nth-child(2)::before{content:"Mobile"}
     td:nth-child(3)::before{content:"Action"}
 
-    button{
-        width:100%;
-    }
+    button{width:100%;}
 }
 </style>
 </head>
@@ -140,8 +113,16 @@ th{
 
 <div class="controls">
 
-<input type="file" id="fileInput">
+<b>Choose Excel File</b>
+<input type="file" id="fileInput" accept=".xlsx,.xls,.csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+
 <button onclick="resetAll()">Reset</button>
+
+<hr>
+
+<b>OR Paste File URL / Google Sheets Link</b>
+<input type="text" id="fileUrl" placeholder="Paste XLSX URL or Google Sheets link">
+<button onclick="loadFromUrl()">Load From URL</button>
 
 <br><br>
 
@@ -150,9 +131,8 @@ th{
 <br><br>
 
 <b>Master Message (use #Name for personalization)</b>
-<br>
 <textarea id="masterMessage"></textarea>
-<br>
+
 <button onclick="clearMessage()">Clear Message</button>
 
 <br><br>
@@ -182,21 +162,49 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
     reader.onload = function(e) {
         const data = new Uint8Array(e.target.result);
         workbook = XLSX.read(data, {type:'array'});
-
-        let sheetSelect = document.getElementById("sheetSelect");
-        sheetSelect.innerHTML = "";
-
-        workbook.SheetNames.forEach(name=>{
-            let option = document.createElement("option");
-            option.value = name;
-            option.text = name;
-            sheetSelect.appendChild(option);
-        });
-
-        loadSheet();
+        populateSheets();
     };
     reader.readAsArrayBuffer(e.target.files[0]);
 });
+
+async function loadFromUrl(){
+    let url = document.getElementById("fileUrl").value.trim();
+    if(!url) return alert("Paste URL first");
+
+    try{
+        // convert google sheet to xlsx export
+        if(url.includes("docs.google.com")){
+            let match = url.match(/\/d\/(.*?)\//);
+            if(match){
+                url = `https://docs.google.com/spreadsheets/d/${match[1]}/export?format=xlsx`;
+            }
+        }
+
+        const res = await fetch(url);
+        const arrayBuffer = await res.arrayBuffer();
+        const data = new Uint8Array(arrayBuffer);
+
+        workbook = XLSX.read(data, {type:'array'});
+        populateSheets();
+
+    }catch(e){
+        alert("Unable to load file. Make sure link is public.");
+    }
+}
+
+function populateSheets(){
+    let sheetSelect = document.getElementById("sheetSelect");
+    sheetSelect.innerHTML = "";
+
+    workbook.SheetNames.forEach(name=>{
+        let option = document.createElement("option");
+        option.value = name;
+        option.text = name;
+        sheetSelect.appendChild(option);
+    });
+
+    loadSheet();
+}
 
 function loadSheet(){
     let sheetName = document.getElementById("sheetSelect").value;
@@ -261,6 +269,7 @@ function sendAll(){
 function resetAll(){
     workbook = null;
     document.getElementById("fileInput").value = "";
+    document.getElementById("fileUrl").value = "";
     document.getElementById("sheetSelect").innerHTML = "";
     document.querySelector("#dataTable tbody").innerHTML = "";
 }
