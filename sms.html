@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>WhatsApp Broadcast XLSX</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial;
+    margin:0;
+    padding:12px;
+    background:#f5f5f5;
+}
+
+h2{
+    margin-top:0;
+    font-size:20px;
+}
+
+/* Controls container */
+.controls{
+    background:white;
+    padding:12px;
+    border-radius:8px;
+    margin-bottom:12px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* Inputs */
+input[type="file"],
+select,
+textarea{
+    width:100%;
+    margin-top:6px;
+    margin-bottom:10px;
+}
+
+textarea{
+    height:110px;
+    padding:8px;
+    border:1px solid #ddd;
+    border-radius:6px;
+    font-size:14px;
+}
+
+/* Buttons */
+button{
+    padding:10px 12px;
+    background:#25D366;
+    color:white;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:14px;
+    margin:4px 4px 4px 0;
+}
+
+button:hover{
+    background:#128C7E;
+}
+
+/* Table wrapper */
+.table-wrapper{
+    overflow-x:auto;
+}
+
+table{
+    border-collapse:collapse;
+    width:100%;
+    background:white;
+    border-radius:8px;
+    overflow:hidden;
+}
+
+th,td{
+    border:1px solid #ddd;
+    padding:8px;
+    text-align:left;
+    font-size:14px;
+}
+
+th{
+    background:#25D366;
+    color:white;
+}
+
+/* MOBILE VIEW */
+@media(max-width:600px){
+
+    table, thead, tbody, th, td, tr{
+        display:block;
+    }
+
+    thead{
+        display:none;
+    }
+
+    tr{
+        background:white;
+        margin-bottom:10px;
+        border-radius:8px;
+        padding:10px;
+        box-shadow:0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    td{
+        border:none;
+        padding:6px 0;
+    }
+
+    td::before{
+        font-weight:bold;
+        display:block;
+        font-size:12px;
+        color:#777;
+    }
+
+    td:nth-child(1)::before{content:"Name"}
+    td:nth-child(2)::before{content:"Mobile"}
+    td:nth-child(3)::before{content:"Action"}
+
+    button{
+        width:100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<h2>WhatsApp Broadcast Tool</h2>
+
+<div class="controls">
+
+<input type="file" id="fileInput">
+<button onclick="resetAll()">Reset</button>
+
+<br><br>
+
+<select id="sheetSelect" onchange="loadSheet()"></select>
+
+<br><br>
+
+<b>Master Message (use #Name for personalization)</b>
+<br>
+<textarea id="masterMessage"></textarea>
+<br>
+<button onclick="clearMessage()">Clear Message</button>
+
+<br><br>
+
+<button onclick="sendAll()">Send All</button>
+
+</div>
+
+<div class="table-wrapper">
+<table id="dataTable">
+<thead>
+<tr>
+<th>Name</th>
+<th>Mobile</th>
+<th>Send</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+
+<script>
+let workbook;
+
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        workbook = XLSX.read(data, {type:'array'});
+
+        let sheetSelect = document.getElementById("sheetSelect");
+        sheetSelect.innerHTML = "";
+
+        workbook.SheetNames.forEach(name=>{
+            let option = document.createElement("option");
+            option.value = name;
+            option.text = name;
+            sheetSelect.appendChild(option);
+        });
+
+        loadSheet();
+    };
+    reader.readAsArrayBuffer(e.target.files[0]);
+});
+
+function loadSheet(){
+    let sheetName = document.getElementById("sheetSelect").value;
+    let sheet = workbook.Sheets[sheetName];
+    let json = XLSX.utils.sheet_to_json(sheet, {header:1});
+
+    let tbody = document.querySelector("#dataTable tbody");
+    tbody.innerHTML = "";
+
+    for(let i=1;i<json.length;i++){
+        let row = json[i];
+        let name = row[1];
+        let phone = row[8];
+
+        if(!phone) continue;
+
+        let tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${name || ""}</td>
+            <td>${phone}</td>
+            <td><button onclick="sendSingle('${phone}','${name}')">Send</button></td>
+        `;
+
+        tbody.appendChild(tr);
+    }
+}
+
+function getMessage(name){
+    let master = document.getElementById("masterMessage").value;
+    return master.replace(/#Name/g, name || "");
+}
+
+function cleanPhone(phone){
+    let p = phone.toString().replace(/\D/g,'');
+    if(p.length==10) p = "91"+p;
+    return p;
+}
+
+function sendSingle(phone,name){
+    let message = getMessage(name);
+    let url = "https://wa.me/" + cleanPhone(phone) + "?text=" + encodeURIComponent(message);
+    window.open(url, '_blank');
+}
+
+function sendAll(){
+    let rows = document.querySelectorAll("#dataTable tbody tr");
+
+    rows.forEach((row, index) => {
+        let name = row.children[0].innerText;
+        let phone = row.children[1].innerText;
+
+        let message = getMessage(name);
+
+        setTimeout(()=>{
+            let url = "https://wa.me/" + cleanPhone(phone) + "?text=" + encodeURIComponent(message);
+            window.open(url, '_blank');
+        }, index * 1500);
+    });
+}
+
+function resetAll(){
+    workbook = null;
+    document.getElementById("fileInput").value = "";
+    document.getElementById("sheetSelect").innerHTML = "";
+    document.querySelector("#dataTable tbody").innerHTML = "";
+}
+
+function clearMessage(){
+    document.getElementById("masterMessage").value = "";
+}
+</script>
+
+</body>
+</html>
