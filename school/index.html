@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form - GP, EP, FP</title>
+  <!-- jsPDF and html2canvas CDN libraries for PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+    }
+    .form-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #333333;
+      margin-bottom: 20px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    .full-width {
+      grid-column: span 2;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+    label {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #555555;
+    }
+    input, select, textarea {
+      padding: 10px;
+      border: 1px solid #cccccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .button-group {
+      margin-top: 25px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: bold;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-submit {
+      background-color: #25D366;
+      color: white;
+    }
+    .btn-cancel {
+      background-color: #777777;
+      color: white;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+
+<div class="form-container" id="studentFormContainer">
+  <h2>Form - GP, EP, FP</h2>
+  <form id="studentForm">
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="class">Class</label>
+        <input type="text" id="class">
+      </div>
+      <div class="form-group">
+        <label for="studentName">Name</label>
+        <input type="text" id="studentName">
+      </div>
+      <div class="form-group">
+        <label for="gender">Gender</label>
+        <select id="gender">
+          <option value="">Select Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="dob">Date of Birth</label>
+        <input type="text" id="dob" placeholder="DD/MM/YYYY">
+      </div>
+      <div class="form-group">
+        <label for="motherName">Mother's Name</label>
+        <input type="text" id="motherName">
+      </div>
+      <div class="form-group">
+        <label for="motherAadhaar">Mother's Aadhaar</label>
+        <input type="text" id="motherAadhaar">
+      </div>
+      <div class="form-group">
+        <label for="fatherName">Father's Name</label>
+        <input type="text" id="fatherName">
+      </div>
+      <div class="form-group">
+        <label for="fatherAadhaar">Father's Aadhaar</label>
+        <input type="text" id="fatherAadhaar">
+      </div>
+      <div class="form-group">
+        <label for="studentAadhaar">Aadhaar Number of Student</label>
+        <input type="text" id="studentAadhaar">
+      </div>
+      <div class="form-group">
+        <label for="nameAadhaarCard">Name on Aadhaar Card</label>
+        <input type="text" id="nameAadhaarCard">
+      </div>
+      <div class="form-group full-width">
+        <label for="address">Address</label>
+        <textarea id="address" rows="2"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="pincode">Pincode</label>
+        <input type="text" id="pincode">
+      </div>
+      <div class="form-group">
+        <label for="mobileNumber">Mobile Number</label>
+        <input type="tel" id="mobileNumber">
+      </div>
+      <div class="form-group">
+        <label for="socialCategory">Social Category</label>
+        <select id="socialCategory">
+          <option value="">Select Category</option>
+          <option value="SC">SC</option>
+          <option value="OBC">OBC</option>
+          <option value="GC">GC</option>
+          <option value="ST">ST</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="muslim">Muslim</label>
+        <select id="muslim">
+          <option value="">Select</option>
+          <option value="NO">NO</option>
+          <option value="YES">YES</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="cwsn">CWSN</label>
+        <select id="cwsn">
+          <option value="">Select</option>
+          <option value="NO">NO</option>
+          <option value="YES">YES</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="bloodGroup">Blood Group</label>
+        <input type="text" id="bloodGroup">
+      </div>
+      <div class="form-group">
+        <label for="admissionNumber">Admission Number</label>
+        <input type="text" id="admissionNumber">
+      </div>
+      <div class="form-group">
+        <label for="admissionDate">Admission Date</label>
+        <input type="text" id="admissionDate" placeholder="DD/MM/YYYY">
+      </div>
+      <div class="form-group">
+        <label for="rollNumber">Roll Number</label>
+        <input type="text" id="rollNumber">
+      </div>
+      <div class="form-group">
+        <label for="height">Student's Height (in CMs)</label>
+        <input type="number" id="height">
+      </div>
+      <div class="form-group">
+        <label for="weight">Student's Weight (in KGs)</label>
+        <input type="number" id="weight">
+      </div>
+      <div class="form-group">
+        <label for="distance">Distance of student's residence</label>
+        <input type="text" id="distance">
+      </div>
+      <div class="form-group full-width">
+        <label for="highestEducation">Completed Highest Education Level of Mother/Father</label>
+        <input type="text" id="highestEducation">
+      </div>
+      <div class="form-group full-width">
+        <label for="pen">PEN (IF AVAILABLE)</label>
+        <input type="text" id="pen">
+      </div>
+    </div>
+
+    <div class="button-group">
+      <button type="button" class="btn-cancel" onclick="refreshForm()">Cancel</button>
+      <button type="submit" class="btn-submit">Submit & Send</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  function refreshForm() {
+    window.location.reload();
+  }
+
+  document.getElementById('studentForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // Construct filename: <Name>-<Class>-<Father's Name>.pdf
+    const nameVal = document.getElementById('studentName').value.trim();
+    const classVal = document.getElementById('class').value.trim();
+    const fatherVal = document.getElementById('fatherName').value.trim();
+
+    let fileName = 'Student_Form.pdf';
+    if (nameVal || classVal || fatherVal) {
+      fileName = `${nameVal || 'Name'}-${classVal || 'Class'}-${fatherVal || 'Father'}.pdf`;
+    }
+
+    // 1. Download PDF
+    const element = document.getElementById('studentFormContainer');
+    const { jsPDF } = window.jspdf;
+    
+    html2canvas(element, { scale: 2 }).then(canvas => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 210;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      pdf.save(fileName);
+    });
+
+    // 2. Open WhatsApp with pre-filled text
+    const phoneNumber = "918650000979";
+    const message = `*Form Submission - GP, EP, FP*
+----------------------------------
+*Class:* ${document.getElementById('class').value}
+*Student Name:* ${document.getElementById('studentName').value}
+*Gender:* ${document.getElementById('gender').value}
+*DOB:* ${document.getElementById('dob').value}
+*Mother's Name:* ${document.getElementById('motherName').value}
+*Mother's Aadhaar:* ${document.getElementById('motherAadhaar').value}
+*Father's Name:* ${document.getElementById('fatherName').value}
+*Father's Aadhaar:* ${document.getElementById('fatherAadhaar').value}
+*Student Aadhaar:* ${document.getElementById('studentAadhaar').value}
+*Name on Aadhaar:* ${document.getElementById('nameAadhaarCard').value}
+*Address:* ${document.getElementById('address').value}
+*Pincode:* ${document.getElementById('pincode').value}
+*Mobile:* ${document.getElementById('mobileNumber').value}
+*Social Category:* ${document.getElementById('socialCategory').value}
+*Muslim:* ${document.getElementById('muslim').value}
+*CWSN:* ${document.getElementById('cwsn').value}
+*Blood Group:* ${document.getElementById('bloodGroup').value}
+*Admission No:* ${document.getElementById('admissionNumber').value}
+*Admission Date:* ${document.getElementById('admissionDate').value}
+*Roll No:* ${document.getElementById('rollNumber').value}
+*Height (CM):* ${document.getElementById('height').value}
+*Weight (KG):* ${document.getElementById('weight').value}
+*Distance:* ${document.getElementById('distance').value}
+*Highest Education:* ${document.getElementById('highestEducation').value}
+*PEN:* ${document.getElementById('pen').value}`;
+
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  });
+</script>
+
+</body>
+</html>
